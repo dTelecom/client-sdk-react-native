@@ -12,7 +12,7 @@ import {
   Modal,
 } from 'react-native';
 import { AudioOutputList } from './ui/AudioOutputList';
-import type { SimulationScenario } from 'livekit-client';
+import type { SimulationScenario } from '@dtelecom/livekit-client';
 import { SimulateScenarioList } from './ui/SimulateScenarioList';
 
 export type Props = {
@@ -27,6 +27,7 @@ export type Props = {
   onSimulate: (scenario: SimulationScenario) => void;
   onDisconnectClick: () => void;
   style?: StyleProp<ViewStyle>;
+  openChat: () => void;
 };
 export const RoomControls = ({
   micEnabled = false,
@@ -40,6 +41,7 @@ export const RoomControls = ({
   onSimulate,
   onDisconnectClick,
   style,
+  openChat,
 }: Props) => {
   const [audioModalVisible, setAudioModalVisible] = useState(false);
   const [simulateModalVisible, setSimulateModalVisible] = useState(false);
@@ -66,48 +68,49 @@ export const RoomControls = ({
 
   return (
     <View style={[style, styles.container]}>
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={audioModalVisible}
-        onRequestClose={() => {
-          setAudioModalVisible(!audioModalVisible);
-        }}
-      >
-        <View style={styles.centeredView}>
-          <View style={styles.modalView}>
-            <AudioOutputList
-              onSelect={() => {
-                return setAudioModalVisible(false);
-              }}
-            />
-          </View>
-        </View>
-      </Modal>
+      {/*<Modal*/}
+      {/*  animationType="slide"*/}
+      {/*  transparent={true}*/}
+      {/*  visible={audioModalVisible}*/}
+      {/*  onRequestClose={() => {*/}
+      {/*    setAudioModalVisible(!audioModalVisible);*/}
+      {/*  }}*/}
+      {/*>*/}
+      {/*  <View style={styles.centeredView}>*/}
+      {/*    <View style={styles.modalView}>*/}
+      {/*      <AudioOutputList*/}
+      {/*        onSelect={() => {*/}
+      {/*          return setAudioModalVisible(false);*/}
+      {/*        }}*/}
+      {/*      />*/}
+      {/*    </View>*/}
+      {/*  </View>*/}
+      {/*</Modal>*/}
 
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={simulateModalVisible}
-        onRequestClose={() => {
-          setSimulateModalVisible(!simulateModalVisible);
-        }}
-      >
-        <View style={styles.centeredView}>
-          <View style={styles.modalView}>
-            <SimulateScenarioList
-              onSelect={(simulate) => {
-                onSimulate(simulate);
-                return setSimulateModalVisible(false);
-              }}
-            />
-          </View>
-        </View>
-      </Modal>
+      {/*<Modal*/}
+      {/*  animationType="slide"*/}
+      {/*  transparent={true}*/}
+      {/*  visible={simulateModalVisible}*/}
+      {/*  onRequestClose={() => {*/}
+      {/*    setSimulateModalVisible(!simulateModalVisible);*/}
+      {/*  }}*/}
+      {/*>*/}
+      {/*  <View style={styles.centeredView}>*/}
+      {/*    <View style={styles.modalView}>*/}
+      {/*      <SimulateScenarioList*/}
+      {/*        onSelect={(simulate) => {*/}
+      {/*          onSimulate(simulate);*/}
+      {/*          return setSimulateModalVisible(false);*/}
+      {/*        }}*/}
+      {/*      />*/}
+      {/*    </View>*/}
+      {/*  </View>*/}
+      {/*</Modal>*/}
       <Pressable
         onPress={() => {
           setMicEnabled(!micEnabled);
         }}
+        style={styles.btn}
       >
         <Image style={styles.icon} source={micImage} />
       </Pressable>
@@ -115,6 +118,7 @@ export const RoomControls = ({
         onPress={() => {
           setCameraEnabled(!cameraEnabled);
         }}
+        style={styles.btn}
       >
         <Image style={styles.icon} source={cameraImage} />
       </Pressable>
@@ -122,27 +126,32 @@ export const RoomControls = ({
         onPress={() => {
           switchCamera();
         }}
+        style={styles.btn}
       >
         <Image
           style={styles.icon}
           source={require('./icons/camera_flip_outline.png')}
         />
       </Pressable>
+
+      {/*<Pressable*/}
+      {/*  onPress={() => {*/}
+      {/*    setScreenShareEnabled(!screenShareEnabled);*/}
+      {/*  }}*/}
+      {/*>*/}
+      {/*  <Image style={styles.icon} source={screenShareImage} />*/}
+      {/*</Pressable>*/}
+
       <Pressable
         onPress={() => {
-          setScreenShareEnabled(!screenShareEnabled);
+          openChat();
+          // setMessageDialogVisible(true);
         }}
-      >
-        <Image style={styles.icon} source={screenShareImage} />
-      </Pressable>
-      <Pressable
-        onPress={() => {
-          setMessageDialogVisible(true);
-        }}
+        style={styles.btn}
       >
         <Image
-          style={styles.icon}
-          source={require('./icons/message_outline.png')}
+          style={{ ...styles.icon, height: 14, width: 14 }}
+          source={require('./icons/chat.png')}
         />
       </Pressable>
 
@@ -150,31 +159,37 @@ export const RoomControls = ({
         onPress={() => {
           onDisconnectClick();
         }}
-      >
-        <Image
-          style={styles.icon}
-          source={require('./icons/baseline_cancel_white_24dp.png')}
-        />
-      </Pressable>
-
-      <Pressable
-        onPress={() => {
-          setAudioModalVisible(true);
-        }}
-      >
-        <Image style={styles.icon} source={require('./icons/speaker.png')} />
-      </Pressable>
-
-      <Pressable
-        onPress={() => {
-          setSimulateModalVisible(true);
+        style={{
+          ...styles.btn,
+          backgroundColor: '#B30E0E',
+          marginLeft: 'auto',
         }}
       >
         <Image
-          style={styles.icon}
-          source={require('./icons/outline_dots_white_24dp.png')}
+          style={{ ...styles.icon, height: 14, width: 14 }}
+          source={require('./icons/leave.png')}
         />
       </Pressable>
+
+      {/*<Pressable*/}
+      {/*  onPress={() => {*/}
+      {/*    setAudioModalVisible(true);*/}
+      {/*  }}*/}
+      {/*  style={styles.btn}*/}
+      {/*>*/}
+      {/*  <Image style={styles.icon} source={require('./icons/speaker.png')} />*/}
+      {/*</Pressable>*/}
+
+      {/*<Pressable*/}
+      {/*  onPress={() => {*/}
+      {/*    setSimulateModalVisible(true);*/}
+      {/*  }}*/}
+      {/*>*/}
+      {/*  <Image*/}
+      {/*    style={styles.icon}*/}
+      {/*    source={require('./icons/outline_dots_white_24dp.png')}*/}
+      {/*  />*/}
+      {/*</Pressable>*/}
 
       <Dialog.Container
         visible={messageDialogVisible}
@@ -201,10 +216,21 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-evenly',
     marginVertical: 8,
+    gap: 8,
+    paddingHorizontal: 8,
   },
-  icon: {
+  btn: {
     width: 32,
     height: 32,
+    backgroundColor: '#2E3031',
+    padding: 10,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  icon: {
+    width: 20,
+    height: 20,
   },
   centeredView: {
     flex: 1,
@@ -227,9 +253,8 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 5,
   },
-
   dialogItemTextStyle: {
-    color: 'black',
+    color: 'white',
     fontSize: 12,
   },
 });

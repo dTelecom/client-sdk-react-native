@@ -25,7 +25,7 @@ pod install
 Then open in Xcode:
 
 ```sh
-open LivekitReactNativeExample.xcworkspace
+open Dmeet.xcworkspace
 ```
 
 ## Note

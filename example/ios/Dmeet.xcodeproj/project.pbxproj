@@ -11,7 +11,7 @@
 		13B07FBC1A68108700A75B9A /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.mm */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
-		4C39C56BAD484C67AA576FFA /* libPods-LivekitReactNativeExample.a in Frameworks */ = {isa = PBXBuildFile; fileRef = CA3E69C5B9553B26FBA2DF04 /* libPods-LivekitReactNativeExample.a */; };
+		4C39C56BAD484C67AA576FFA /* libPods-Dmeet.a in Frameworks */ = {isa = PBXBuildFile; fileRef = CA3E69C5B9553B26FBA2DF04 /* libPods-Dmeet.a */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
 		D767E4EE283D20BC0077477C /* ReplayKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D767E4ED283D20BC0077477C /* ReplayKit.framework */; };
 		D767E4F1283D20BC0077477C /* SampleHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = D767E4F0283D20BC0077477C /* SampleHandler.swift */; };
@@ -29,7 +29,7 @@
 			containerPortal = 83CBB9F71A601CBA00E9B192 /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = 13B07F861A680F5B00A75B9A;
-			remoteInfo = LivekitReactNativeExample;
+			remoteInfo = Dmeet;
 		};
 		D767E4F3283D20BC0077477C /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -59,15 +59,15 @@
 		00E356EE1AD99517003FC87E /* LivekitReactNativeExampleTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = LivekitReactNativeExampleTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		00E356F11AD99517003FC87E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		00E356F21AD99517003FC87E /* LivekitReactNativeExampleTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = LivekitReactNativeExampleTests.m; sourceTree = "<group>"; };
-		13B07F961A680F5B00A75B9A /* LivekitReactNativeExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LivekitReactNativeExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		13B07FAF1A68108700A75B9A /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = LivekitReactNativeExample/AppDelegate.h; sourceTree = "<group>"; };
-		13B07FB01A68108700A75B9A /* AppDelegate.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = AppDelegate.mm; path = LivekitReactNativeExample/AppDelegate.mm; sourceTree = "<group>"; };
-		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = LivekitReactNativeExample/Images.xcassets; sourceTree = "<group>"; };
-		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = LivekitReactNativeExample/Info.plist; sourceTree = "<group>"; };
-		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = LivekitReactNativeExample/main.m; sourceTree = "<group>"; };
-		47F7ED3B7971BE374F7B8635 /* Pods-LivekitReactNativeExample.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-LivekitReactNativeExample.debug.xcconfig"; path = "Target Support Files/Pods-LivekitReactNativeExample/Pods-LivekitReactNativeExample.debug.xcconfig"; sourceTree = "<group>"; };
-		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = LivekitReactNativeExample/LaunchScreen.storyboard; sourceTree = "<group>"; };
-		CA3E69C5B9553B26FBA2DF04 /* libPods-LivekitReactNativeExample.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-LivekitReactNativeExample.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		13B07F961A680F5B00A75B9A /* Dmeet.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Dmeet.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		13B07FAF1A68108700A75B9A /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = Dmeet/AppDelegate.h; sourceTree = "<group>"; };
+		13B07FB01A68108700A75B9A /* AppDelegate.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = AppDelegate.mm; path = Dmeet/AppDelegate.mm; sourceTree = "<group>"; };
+		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = Dmeet/Images.xcassets; sourceTree = "<group>"; };
+		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = Dmeet/Info.plist; sourceTree = "<group>"; };
+		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = Dmeet/main.m; sourceTree = "<group>"; };
+		47F7ED3B7971BE374F7B8635 /* Pods-Dmeet.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Dmeet.debug.xcconfig"; path = "Target Support Files/Pods-Dmeet/Pods-Dmeet.debug.xcconfig"; sourceTree = "<group>"; };
+		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = Dmeet/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		CA3E69C5B9553B26FBA2DF04 /* libPods-Dmeet.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Dmeet.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		D767E4EC283D20BC0077477C /* BroadcastExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = BroadcastExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		D767E4ED283D20BC0077477C /* ReplayKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ReplayKit.framework; path = System/Library/Frameworks/ReplayKit.framework; sourceTree = SDKROOT; };
 		D767E4F0283D20BC0077477C /* SampleHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SampleHandler.swift; sourceTree = "<group>"; };
@@ -78,9 +78,9 @@
 		D767E4FD283D293A0077477C /* SampleUploader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SampleUploader.swift; sourceTree = "<group>"; };
 		D767E4FE283D293A0077477C /* DarwinNotificationCenter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DarwinNotificationCenter.swift; sourceTree = "<group>"; };
 		D767E4FF283D293A0077477C /* Atomic.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Atomic.swift; sourceTree = "<group>"; };
-		D767E506283D2BAE0077477C /* LivekitReactNativeExample.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = LivekitReactNativeExample.entitlements; path = LivekitReactNativeExample/LivekitReactNativeExample.entitlements; sourceTree = "<group>"; };
+		D767E506283D2BAE0077477C /* Dmeet.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = Dmeet.entitlements; path = Dmeet/Dmeet.entitlements; sourceTree = "<group>"; };
 		D767E507283D2BF00077477C /* BroadcastExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = BroadcastExtension.entitlements; sourceTree = "<group>"; };
-		E00ACF0FDA8BF921659E2F9A /* Pods-LivekitReactNativeExample.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-LivekitReactNativeExample.release.xcconfig"; path = "Target Support Files/Pods-LivekitReactNativeExample/Pods-LivekitReactNativeExample.release.xcconfig"; sourceTree = "<group>"; };
+		E00ACF0FDA8BF921659E2F9A /* Pods-Dmeet.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Dmeet.release.xcconfig"; path = "Target Support Files/Pods-Dmeet/Pods-Dmeet.release.xcconfig"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		ED2971642150620600B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = Platforms/AppleTVOS.platform/Developer/SDKs/AppleTVOS12.0.sdk/System/Library/Frameworks/JavaScriptCore.framework; sourceTree = DEVELOPER_DIR; };
 /* End PBXFileReference section */
@@ -97,7 +97,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4C39C56BAD484C67AA576FFA /* libPods-LivekitReactNativeExample.a in Frameworks */,
+				4C39C56BAD484C67AA576FFA /* libPods-Dmeet.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -129,10 +129,10 @@
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
-		13B07FAE1A68108700A75B9A /* LivekitReactNativeExample */ = {
+		13B07FAE1A68108700A75B9A /* Dmeet */ = {
 			isa = PBXGroup;
 			children = (
-				D767E506283D2BAE0077477C /* LivekitReactNativeExample.entitlements */,
+				D767E506283D2BAE0077477C /* Dmeet.entitlements */,
 				008F07F21AC5B25A0029DE68 /* main.jsbundle */,
 				13B07FAF1A68108700A75B9A /* AppDelegate.h */,
 				13B07FB01A68108700A75B9A /* AppDelegate.mm */,
@@ -141,7 +141,7 @@
 				81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */,
 				13B07FB71A68108700A75B9A /* main.m */,
 			);
-			name = LivekitReactNativeExample;
+			name = Dmeet;
 			sourceTree = "<group>";
 		};
 		2D16E6871FA4F8E400B85C8A /* Frameworks */ = {
@@ -149,7 +149,7 @@
 			children = (
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
 				ED2971642150620600B7C4FE /* JavaScriptCore.framework */,
-				CA3E69C5B9553B26FBA2DF04 /* libPods-LivekitReactNativeExample.a */,
+				CA3E69C5B9553B26FBA2DF04 /* libPods-Dmeet.a */,
 				D767E4ED283D20BC0077477C /* ReplayKit.framework */,
 			);
 			name = Frameworks;
@@ -158,8 +158,8 @@
 		6B9684456A2045ADE5A6E47E /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				47F7ED3B7971BE374F7B8635 /* Pods-LivekitReactNativeExample.debug.xcconfig */,
-				E00ACF0FDA8BF921659E2F9A /* Pods-LivekitReactNativeExample.release.xcconfig */,
+				47F7ED3B7971BE374F7B8635 /* Pods-Dmeet.debug.xcconfig */,
+				E00ACF0FDA8BF921659E2F9A /* Pods-Dmeet.release.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
@@ -174,7 +174,7 @@
 		83CBB9F61A601CBA00E9B192 = {
 			isa = PBXGroup;
 			children = (
-				13B07FAE1A68108700A75B9A /* LivekitReactNativeExample */,
+				13B07FAE1A68108700A75B9A /* Dmeet */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
 				00E356EF1AD99517003FC87E /* LivekitReactNativeExampleTests */,
 				D767E4EF283D20BC0077477C /* BroadcastExtension */,
@@ -190,7 +190,7 @@
 		83CBBA001A601CBA00E9B192 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				13B07F961A680F5B00A75B9A /* LivekitReactNativeExample.app */,
+				13B07F961A680F5B00A75B9A /* Dmeet.app */,
 				00E356EE1AD99517003FC87E /* LivekitReactNativeExampleTests.xctest */,
 				D767E4EC283D20BC0077477C /* BroadcastExtension.appex */,
 			);
@@ -234,9 +234,9 @@
 			productReference = 00E356EE1AD99517003FC87E /* LivekitReactNativeExampleTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
-		13B07F861A680F5B00A75B9A /* LivekitReactNativeExample */ = {
+		13B07F861A680F5B00A75B9A /* Dmeet */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "LivekitReactNativeExample" */;
+			buildConfigurationList = 13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "Dmeet" */;
 			buildPhases = (
 				4F0A6FC082772762E3E4C96C /* [CP] Check Pods Manifest.lock */,
 				FD10A7F022414F080027D42C /* Start Packager */,
@@ -253,9 +253,9 @@
 			dependencies = (
 				D767E4F4283D20BC0077477C /* PBXTargetDependency */,
 			);
-			name = LivekitReactNativeExample;
-			productName = LivekitReactNativeExample;
-			productReference = 13B07F961A680F5B00A75B9A /* LivekitReactNativeExample.app */;
+			name = Dmeet;
+			productName = Dmeet;
+			productReference = 13B07F961A680F5B00A75B9A /* Dmeet.app */;
 			productType = "com.apple.product-type.application";
 		};
 		D767E4EB283D20BC0077477C /* BroadcastExtension */ = {
@@ -286,21 +286,21 @@
 				TargetAttributes = {
 					00E356ED1AD99517003FC87E = {
 						CreatedOnToolsVersion = 6.2;
-						DevelopmentTeam = 76TVFCUKK7;
+						DevelopmentTeam = JQFNBGZW5U;
 						TestTargetID = 13B07F861A680F5B00A75B9A;
 					};
 					13B07F861A680F5B00A75B9A = {
-						DevelopmentTeam = 76TVFCUKK7;
+						DevelopmentTeam = JQFNBGZW5U;
 						LastSwiftMigration = 1120;
 					};
 					D767E4EB283D20BC0077477C = {
 						CreatedOnToolsVersion = 13.4;
-						DevelopmentTeam = 76TVFCUKK7;
+						DevelopmentTeam = JQFNBGZW5U;
 						ProvisioningStyle = Automatic;
 					};
 				};
 			};
-			buildConfigurationList = 83CBB9FA1A601CBA00E9B192 /* Build configuration list for PBXProject "LivekitReactNativeExample" */;
+			buildConfigurationList = 83CBB9FA1A601CBA00E9B192 /* Build configuration list for PBXProject "Dmeet" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -313,7 +313,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				13B07F861A680F5B00A75B9A /* LivekitReactNativeExample */,
+				13B07F861A680F5B00A75B9A /* Dmeet */,
 				00E356ED1AD99517003FC87E /* LivekitReactNativeExampleTests */,
 				D767E4EB283D20BC0077477C /* BroadcastExtension */,
 			);
@@ -367,7 +367,7 @@
 			files = (
 			);
 			inputPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-LivekitReactNativeExample/Pods-LivekitReactNativeExample-frameworks.sh",
+				"${PODS_ROOT}/Target Support Files/Pods-Dmeet/Pods-Dmeet-frameworks.sh",
 				"${PODS_XCFRAMEWORKS_BUILD_DIR}/Flipper-DoubleConversion/double-conversion.framework/double-conversion",
 				"${PODS_XCFRAMEWORKS_BUILD_DIR}/Flipper-Glog/glog.framework/glog",
 				"${PODS_XCFRAMEWORKS_BUILD_DIR}/OpenSSL-Universal/OpenSSL.framework/OpenSSL",
@@ -384,7 +384,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-LivekitReactNativeExample/Pods-LivekitReactNativeExample-frameworks.sh\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Dmeet/Pods-Dmeet-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		4F0A6FC082772762E3E4C96C /* [CP] Check Pods Manifest.lock */ = {
@@ -402,7 +402,7 @@
 			outputFileListPaths = (
 			);
 			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-LivekitReactNativeExample-checkManifestLockResult.txt",
+				"$(DERIVED_FILE_DIR)/Pods-Dmeet-checkManifestLockResult.txt",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -415,7 +415,7 @@
 			files = (
 			);
 			inputPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-LivekitReactNativeExample/Pods-LivekitReactNativeExample-resources.sh",
+				"${PODS_ROOT}/Target Support Files/Pods-Dmeet/Pods-Dmeet-resources.sh",
 				"${PODS_CONFIGURATION_BUILD_DIR}/React-Core/AccessibilityResources.bundle",
 			);
 			name = "[CP] Copy Pods Resources";
@@ -424,7 +424,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-LivekitReactNativeExample/Pods-LivekitReactNativeExample-resources.sh\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Dmeet/Pods-Dmeet-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		FD10A7F022414F080027D42C /* Start Packager */ = {
@@ -484,7 +484,7 @@
 /* Begin PBXTargetDependency section */
 		00E356F51AD99517003FC87E /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 13B07F861A680F5B00A75B9A /* LivekitReactNativeExample */;
+			target = 13B07F861A680F5B00A75B9A /* Dmeet */;
 			targetProxy = 00E356F41AD99517003FC87E /* PBXContainerItemProxy */;
 		};
 		D767E4F4283D20BC0077477C /* PBXTargetDependency */ = {
@@ -500,7 +500,7 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
-				DEVELOPMENT_TEAM = 76TVFCUKK7;
+				DEVELOPMENT_TEAM = JQFNBGZW5U;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
 					"$(inherited)",
@@ -513,9 +513,9 @@
 					"-lc++",
 					"$(inherited)",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = io.livekit.example.reactnative;
+				PRODUCT_BUNDLE_IDENTIFIER = org.dmeet;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/LivekitReactNativeExample.app/LivekitReactNativeExample";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Dmeet.app/Dmeet";
 			};
 			name = Debug;
 		};
@@ -525,7 +525,7 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				COPY_PHASE_STRIP = NO;
-				DEVELOPMENT_TEAM = 76TVFCUKK7;
+				DEVELOPMENT_TEAM = JQFNBGZW5U;
 				INFOPLIST_FILE = LivekitReactNativeExampleTests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
@@ -534,24 +534,25 @@
 					"-lc++",
 					"$(inherited)",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = io.livekit.example.reactnative;
+				PRODUCT_BUNDLE_IDENTIFIER = org.dmeet;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/LivekitReactNativeExample.app/LivekitReactNativeExample";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Dmeet.app/Dmeet";
 			};
 			name = Release;
 		};
 		13B07F941A680F5B00A75B9A /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 47F7ED3B7971BE374F7B8635 /* Pods-LivekitReactNativeExample.debug.xcconfig */;
+			baseConfigurationReference = 47F7ED3B7971BE374F7B8635 /* Pods-Dmeet.debug.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_ENTITLEMENTS = LivekitReactNativeExample/LivekitReactNativeExample.entitlements;
+				CODE_SIGN_ENTITLEMENTS = Dmeet/Dmeet.entitlements;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 76TVFCUKK7;
+				DEVELOPMENT_TEAM = JQFNBGZW5U;
 				ENABLE_BITCODE = NO;
-				INFOPLIST_FILE = LivekitReactNativeExample/Info.plist;
+				INFOPLIST_FILE = Dmeet/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Dmeet;
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				OTHER_LDFLAGS = (
@@ -559,8 +560,8 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = io.livekit.example.reactnative;
-				PRODUCT_NAME = LivekitReactNativeExample;
+				PRODUCT_BUNDLE_IDENTIFIER = org.dmeet;
+				PRODUCT_NAME = Dmeet;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";
@@ -569,15 +570,16 @@
 		};
 		13B07F951A680F5B00A75B9A /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = E00ACF0FDA8BF921659E2F9A /* Pods-LivekitReactNativeExample.release.xcconfig */;
+			baseConfigurationReference = E00ACF0FDA8BF921659E2F9A /* Pods-Dmeet.release.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_ENTITLEMENTS = LivekitReactNativeExample/LivekitReactNativeExample.entitlements;
+				CODE_SIGN_ENTITLEMENTS = Dmeet/Dmeet.entitlements;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 76TVFCUKK7;
-				INFOPLIST_FILE = LivekitReactNativeExample/Info.plist;
+				DEVELOPMENT_TEAM = JQFNBGZW5U;
+				INFOPLIST_FILE = Dmeet/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Dmeet;
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				OTHER_LDFLAGS = (
@@ -585,8 +587,8 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = io.livekit.example.reactnative;
-				PRODUCT_NAME = LivekitReactNativeExample;
+				PRODUCT_BUNDLE_IDENTIFIER = org.dmeet;
+				PRODUCT_NAME = Dmeet;
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";
 			};
@@ -746,7 +748,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = dwarf;
-				DEVELOPMENT_TEAM = 76TVFCUKK7;
+				DEVELOPMENT_TEAM = JQFNBGZW5U;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = BroadcastExtension/Info.plist;
@@ -757,7 +759,7 @@
 				MARKETING_VERSION = 1.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = io.livekit.example.reactnative.BroadcastExtension;
+				PRODUCT_BUNDLE_IDENTIFIER = org.dmeet.BroadcastExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
@@ -783,7 +785,7 @@
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DEVELOPMENT_TEAM = 76TVFCUKK7;
+				DEVELOPMENT_TEAM = JQFNBGZW5U;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = BroadcastExtension/Info.plist;
@@ -793,7 +795,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
 				MARKETING_VERSION = 1.0;
 				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = io.livekit.example.reactnative.BroadcastExtension;
+				PRODUCT_BUNDLE_IDENTIFIER = org.dmeet.BroadcastExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -815,7 +817,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "LivekitReactNativeExample" */ = {
+		13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "Dmeet" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				13B07F941A680F5B00A75B9A /* Debug */,
@@ -824,7 +826,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		83CBB9FA1A601CBA00E9B192 /* Build configuration list for PBXProject "LivekitReactNativeExample" */ = {
+		83CBB9FA1A601CBA00E9B192 /* Build configuration list for PBXProject "Dmeet" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				83CBBA201A601CBA00E9B192 /* Debug */,

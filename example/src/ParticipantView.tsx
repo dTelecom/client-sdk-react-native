@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 import { Image, StyleSheet, ViewStyle } from 'react-native';
-import type { Participant } from 'livekit-client';
+import type { Participant } from '@dtelecom/livekit-client';
 import { useParticipant, VideoView } from '@livekit/react-native';
 import { View } from 'react-native';
 import { Text } from 'react-native';
@@ -77,7 +77,8 @@ const styles = StyleSheet.create({
   identityBar: {
     position: 'absolute',
     bottom: 0,
-    width: '100%',
+    // width: '100%',
+    paddingHorizontal: 10,
     zIndex: 1,
     padding: 2,
     backgroundColor: 'rgba(0,0,0,0.5)',

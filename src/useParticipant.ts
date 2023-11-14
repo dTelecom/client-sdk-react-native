@@ -5,7 +5,7 @@ import {
   ParticipantEvent,
   Track,
   TrackPublication,
-} from 'livekit-client';
+} from '@dtelecom/livekit-client';
 import { useEffect, useState } from 'react';
 
 export interface ParticipantState {

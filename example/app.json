@@ -1,4 +1,7 @@
 {
-  "name": "LivekitReactNativeExample",
-  "displayName": "LivekitReactNative Example"
+  "name": "Dmeet",
+  "displayName": "Dmeet",
+  "expo": {
+    "scheme": "dmeet"
+  }
 }

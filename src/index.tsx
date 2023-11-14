@@ -7,7 +7,7 @@ import AudioSession, {
 } from './audio/AudioSession';
 import type { AudioConfiguration } from './audio/AudioSession';
 import { PixelRatio, Platform } from 'react-native';
-import type { LiveKitReactNativeInfo } from 'livekit-client';
+import type { LiveKitReactNativeInfo } from '@dtelecom/livekit-client';
 
 /**
  * Registers the required globals needed for LiveKit to work.

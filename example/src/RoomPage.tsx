@@ -1,37 +1,47 @@
 import * as React from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 import {
-  StyleSheet,
-  View,
-  FlatList,
-  ListRenderItem,
+  Dimensions,
   findNodeHandle,
+  Keyboard,
+  ListRenderItem,
   NativeModules,
+  Platform,
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
 } from 'react-native';
 import type { RootStackParamList } from './App';
-import { useEffect, useState } from 'react';
 import { RoomControls } from './RoomControls';
 import { ParticipantView } from './ParticipantView';
+import type { TrackPublication } from '@dtelecom/livekit-client';
 import {
   DataPacket_Kind,
   Participant,
   RemoteParticipant,
   Room,
   RoomEvent,
-} from 'livekit-client';
-import { useRoom, useParticipant, AudioSession } from '@livekit/react-native';
-import type { TrackPublication } from 'livekit-client';
-import { Platform } from 'react-native';
+} from '@dtelecom/livekit-client';
+import { AudioSession, useParticipant, useRoom } from '@livekit/react-native';
 // @ts-ignore
 import {
   mediaDevices,
   ScreenCapturePickerView,
 } from '@livekit/react-native-webrtc';
 import { startCallService, stopCallService } from './callservice/CallService';
-import Toast from 'react-native-toast-message';
 
 import 'fastestsmallesttextencoderdecoder';
+import { Footer } from './ui/Footer';
+import { RoomNavBar } from './ui/RoomNavBar';
+import { FlatGrid } from 'react-native-super-grid';
+import ActionSheet, { ActionSheetRef } from 'react-native-actions-sheet';
+import BaseButton from './ui/BaseButton';
+import axios from 'axios';
 
 export const RoomPage = ({
   navigation,
@@ -45,8 +55,19 @@ export const RoomPage = ({
       })
   );
   const { participants } = useRoom(room);
-  const { url, token } = route.params;
+  const { slug, url, token, roomName, isAdmin, cameraEnabled, micEnabled } =
+    route.params;
   const [isCameraFrontFacing, setCameraFrontFacing] = useState(true);
+  const [message, setMessage] = useState('');
+  const [messages, setMessages] = useState<
+    Array<{
+      message: { message: string; timestamp: string };
+      name: string;
+      fromMe: boolean;
+    }>
+  >([]);
+
+  const actionSheetRef = useRef<ActionSheetRef>(null);
 
   // Perform platform specific call setup.
   useEffect(() => {
@@ -73,14 +94,23 @@ export const RoomPage = ({
       await room.connect(url, token, {});
       console.log('connected to ', url, ' ', token);
       setIsConnected(true);
+
+      await room.localParticipant.setCameraEnabled(cameraEnabled);
+      await room.localParticipant.setMicrophoneEnabled(micEnabled);
     };
 
     connect();
     return () => {
+      if (isAdmin) {
+        axios.post('https://dmeet.org/api/deleteRoom', {
+          slug,
+          identity: room.localParticipant.identity,
+        });
+      }
       room.disconnect();
       AudioSession.stopAudioSession();
     };
-  }, [url, token, room]);
+  }, [url, token, room, micEnabled, cameraEnabled, isAdmin, slug]);
 
   // Setup room listeners
   useEffect(() => {
@@ -92,15 +122,15 @@ export const RoomPage = ({
       let decoder = new TextDecoder('utf-8');
       let message = decoder.decode(payload);
 
-      let title = 'Received Message';
-      if (participant != null) {
-        title = 'Received Message from ' + participant.identity;
-      }
-      Toast.show({
-        type: 'success',
-        text1: title,
-        text2: message,
-      });
+      setMessages((prevState) => [
+        ...prevState,
+        {
+          name: participant?.name || '',
+          message: JSON.parse(message),
+          fromMe: participant?.identity !== room.localParticipant.identity,
+        },
+      ]);
+      console.log(message);
     };
     room.on(RoomEvent.DataReceived, dataReceived);
 
@@ -110,25 +140,15 @@ export const RoomPage = ({
   });
 
   // Setup views.
-  const stageView = participants.length > 0 && (
-    <ParticipantView participant={participants[0]} style={styles.stage} />
-  );
+  // const stageView = participants.length > 0 && (
+  //   <ParticipantView participant={participants[0]} style={styles.stage} />
+  // );
 
   const renderParticipant: ListRenderItem<Participant> = ({ item }) => {
     return (
       <ParticipantView participant={item} style={styles.otherParticipantView} />
     );
   };
-
-  const otherParticipantsView = participants.length > 0 && (
-    <FlatList
-      data={participants}
-      renderItem={renderParticipant}
-      keyExtractor={(item) => item.sid}
-      horizontal={true}
-      style={styles.otherParticipantsList}
-    />
-  );
 
   const { cameraPublication, microphonePublication, screenSharePublication } =
     useParticipant(room.localParticipant);
@@ -149,9 +169,18 @@ export const RoomPage = ({
   };
 
   return (
-    <View style={styles.container}>
-      {stageView}
-      {otherParticipantsView}
+    <SafeAreaView style={styles.container}>
+      <RoomNavBar count={participants.length} roomName={roomName} slug={slug} />
+
+      <FlatGrid
+        itemDimension={200}
+        data={participants}
+        renderItem={renderParticipant}
+        spacing={10}
+        horizontal={true}
+        maxItemsPerRow={2}
+      />
+
       <RoomControls
         micEnabled={isTrackEnabled(microphonePublication)}
         setMicEnabled={(enabled: boolean) => {
@@ -195,29 +224,120 @@ export const RoomPage = ({
           }
         }}
         sendData={(message: string) => {
-          Toast.show({
-            type: 'success',
-            text1: 'Sending Message',
-            text2: message,
-          });
-
           //@ts-ignore
           let encoder = new TextEncoder();
           let encodedData = encoder.encode(message);
           room.localParticipant.publishData(
             encodedData,
-            DataPacket_Kind.RELIABLE
+            DataPacket_Kind.RELIABLE,
+            { topic: 'lk-chat-topic' }
           );
         }}
         onSimulate={(scenario) => {
           room.simulateScenario(scenario);
         }}
-        onDisconnectClick={() => {
-          navigation.pop();
+        onDisconnectClick={async () => {
+          navigation.popToTop();
+        }}
+        openChat={() => {
+          actionSheetRef.current?.show();
         }}
       />
+
       {screenCapturePickerView}
-    </View>
+      <ActionSheet initialSnapIndex={0} snapPoints={[80]} ref={actionSheetRef}>
+        <View style={styles.chatContainer}>
+          <View style={{ height: '78%' }}>
+            <ScrollView
+              style={{
+                transform: [{ scaleY: -1 }],
+                flex: 1,
+              }}
+              horizontal={false}
+            >
+              <View style={{ transform: [{ scaleY: -1 }], paddingBottom: 8 }}>
+                {messages.map((message, index) => {
+                  return (
+                    <View key={index} style={styles.message}>
+                      <View
+                        style={{
+                          flexDirection: 'row',
+                          justifyContent: 'center',
+                        }}
+                      >
+                        <Text style={styles.messageName}>{message.name}</Text>
+                        <Text style={styles.messageTime}>
+                          {
+                            new Date(message.message.timestamp)
+                              .toLocaleTimeString()
+                              .split(':')[0]
+                          }
+                          :
+                          {
+                            new Date(message.message.timestamp)
+                              .toLocaleTimeString()
+                              .split(':')[1]
+                          }
+                        </Text>
+                      </View>
+
+                      <View style={styles.messageTextBubble}>
+                        <Text
+                          key={index}
+                          style={{
+                            ...styles.messageText,
+                            backgroundColor: message.fromMe
+                              ? '#2E3031'
+                              : '#212121',
+                          }}
+                        >
+                          {message.message.message}
+                        </Text>
+                      </View>
+                    </View>
+                  );
+                })}
+              </View>
+            </ScrollView>
+          </View>
+
+          <View
+            style={{
+              flexDirection: 'row',
+              gap: 8,
+              marginBottom: 16,
+              paddingHorizontal: 12,
+            }}
+          >
+            <TextInput
+              style={styles.chatInput}
+              onChangeText={setMessage}
+              value={message}
+              placeholder="Enter your message"
+            />
+            <BaseButton
+              style={styles.chatButton}
+              onPress={() => {
+                //@ts-ignore
+                let encoder = new TextEncoder();
+                let encodedData = encoder.encode(message);
+                room.localParticipant.publishData(
+                  encodedData,
+                  DataPacket_Kind.RELIABLE,
+                  { topic: 'chat' }
+                );
+                setMessage('');
+                Keyboard.dismiss();
+              }}
+            >
+              <Text style={styles.chatButtonText}>Send</Text>
+            </BaseButton>
+          </View>
+        </View>
+      </ActionSheet>
+
+      <Footer />
+    </SafeAreaView>
   );
 };
 
@@ -231,17 +351,71 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  stage: {
-    flex: 1,
-    width: '100%',
-  },
   otherParticipantsList: {
-    width: '100%',
-    height: 150,
-    flexGrow: 0,
+    flex: 1,
+    gap: 8,
+    overflow: 'scroll',
+    flexWrap: 'wrap',
   },
   otherParticipantView: {
-    width: 150,
-    height: 150,
+    flex: 1,
+    height: '100%',
+    width: Dimensions.get('screen').width - 20,
+  },
+  chatContainer: {
+    height: '100%',
+    backgroundColor: '#212121',
+    paddingBottom: '20%',
+  },
+  message: {
+    paddingHorizontal: 12,
+    maxWidth: '80%',
+    gap: 4,
+    marginBottom: 16,
+  },
+  messageName: {
+    color: '#777575',
+    fontSize: 14,
+  },
+  messageTime: {
+    marginLeft: 'auto',
+    color: '#777575',
+    fontSize: 14,
+  },
+  messageTextBubble: {
+    backgroundColor: '#324F36',
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    borderRadius: 5,
+    alignSelf: 'flex-start',
+  },
+  messageText: {
+    backgroundColor: '#324F36',
+    color: '#fff',
+    fontSize: 16,
+    alignSelf: 'flex-start',
+  },
+  chatInput: {
+    flex: 1,
+    height: 42,
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 5,
+    color: '#fff',
+    borderWidth: 1,
+    borderColor: '#777575',
+  },
+  chatButton: {
+    backgroundColor: '#FFFFFF',
+    height: 42,
+    width: 100,
+    borderRadius: 5,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  chatButtonText: {
+    color: '#000',
   },
 });

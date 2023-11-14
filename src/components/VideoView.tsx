@@ -7,10 +7,10 @@ import {
   Track,
   TrackEvent,
   VideoTrack,
-} from 'livekit-client';
+} from '@dtelecom/livekit-client';
 import { RTCView } from '@livekit/react-native-webrtc';
 import { useEffect, useState } from 'react';
-import { RemoteVideoTrack } from 'livekit-client';
+import { RemoteVideoTrack } from '@dtelecom/livekit-client';
 import ViewPortDetector from './ViewPortDetector';
 
 export type Props = {

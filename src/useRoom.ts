@@ -7,7 +7,7 @@ import {
   Room,
   RoomEvent,
   Track,
-} from 'livekit-client';
+} from '@dtelecom/livekit-client';
 import { useEffect, useState } from 'react';
 
 export interface RoomState {

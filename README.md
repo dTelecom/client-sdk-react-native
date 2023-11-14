@@ -57,7 +57,7 @@ public class MainApplication extends Application implements ReactApplication {
 
 ### iOS
 
-In your [AppDelegate.m](https://github.com/livekit/client-sdk-react-native/blob/main/example/ios/LivekitReactNativeExample/AppDelegate.mm) file:
+In your [AppDelegate.m](https://github.com/livekit/client-sdk-react-native/blob/main/example/ios/Dmeet/AppDelegate.mm) file:
 
 ```
 #import "LivekitReactNative.h"

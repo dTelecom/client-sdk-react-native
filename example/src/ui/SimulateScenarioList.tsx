@@ -1,4 +1,4 @@
-import type { SimulationScenario } from 'livekit-client';
+import type { SimulationScenario } from '@dtelecom/livekit-client';
 import React from 'react';
 import {
   FlatList,
