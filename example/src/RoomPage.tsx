@@ -61,7 +61,7 @@ export const RoomPage = ({
   const [message, setMessage] = useState('');
   const [messages, setMessages] = useState<
     Array<{
-      message: { message: string; timestamp: string };
+      message: { message: string; timestamp: number };
       name: string;
       fromMe: boolean;
     }>
@@ -127,7 +127,7 @@ export const RoomPage = ({
         {
           name: participant?.name || '',
           message: JSON.parse(message),
-          fromMe: participant?.identity !== room.localParticipant.identity,
+          fromMe: participant?.identity === room.localParticipant.identity,
         },
       ]);
       console.log(message);
@@ -245,6 +245,7 @@ export const RoomPage = ({
       />
 
       {screenCapturePickerView}
+
       <ActionSheet initialSnapIndex={0} snapPoints={[80]} ref={actionSheetRef}>
         <View style={styles.chatContainer}>
           <View style={{ height: '78%' }}>
@@ -281,16 +282,15 @@ export const RoomPage = ({
                         </Text>
                       </View>
 
-                      <View style={styles.messageTextBubble}>
-                        <Text
-                          key={index}
-                          style={{
-                            ...styles.messageText,
-                            backgroundColor: message.fromMe
-                              ? '#2E3031'
-                              : '#212121',
-                          }}
-                        >
+                      <View
+                        style={{
+                          ...styles.messageTextBubble,
+                          backgroundColor: message.fromMe
+                            ? '#2E3031'
+                            : '#324F36',
+                        }}
+                      >
+                        <Text key={index} style={styles.messageText}>
                           {message.message.message}
                         </Text>
                       </View>
@@ -318,13 +318,25 @@ export const RoomPage = ({
             <BaseButton
               style={styles.chatButton}
               onPress={() => {
+                const msg = {
+                  message,
+                  timestamp: Date.now(),
+                };
                 //@ts-ignore
                 let encoder = new TextEncoder();
-                let encodedData = encoder.encode(message);
+                let encodedData = encoder.encode(JSON.stringify(msg));
+                setMessages((prevState) => [
+                  ...prevState,
+                  {
+                    name: room.localParticipant?.name || '',
+                    message: msg,
+                    fromMe: true,
+                  },
+                ]);
                 room.localParticipant.publishData(
                   encodedData,
                   DataPacket_Kind.RELIABLE,
-                  { topic: 'chat' }
+                  { topic: 'lk-chat-topic' }
                 );
                 setMessage('');
                 Keyboard.dismiss();
@@ -390,10 +402,10 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-start',
   },
   messageText: {
-    backgroundColor: '#324F36',
     color: '#fff',
     fontSize: 16,
     alignSelf: 'flex-start',
+    backgroundColor: 'transparent',
   },
   chatInput: {
     flex: 1,
