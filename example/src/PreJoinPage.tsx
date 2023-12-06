@@ -40,7 +40,7 @@ export const PreJoinPage = ({
           console.log(err);
           return err;
         });
-
+      setRoomName('');
       navigation.push('JoinPage', { slug: data.slug, identity: data.identity });
     } catch (error) {
       console.log(error);

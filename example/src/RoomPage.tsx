@@ -27,12 +27,12 @@ import {
   Room,
   RoomEvent,
 } from '@dtelecom/livekit-client';
-import { AudioSession, useParticipant, useRoom } from '@livekit/react-native';
+import { AudioSession, useParticipant, useRoom } from '@dtelecom/react-native';
 // @ts-ignore
 import {
   mediaDevices,
   ScreenCapturePickerView,
-} from '@livekit/react-native-webrtc';
+} from '@dtelecom/react-native-webrtc';
 import { startCallService, stopCallService } from './callservice/CallService';
 
 import 'fastestsmallesttextencoderdecoder';

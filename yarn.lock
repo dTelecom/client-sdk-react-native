@@ -2571,6 +2571,17 @@
     ts-debounce "^4.0.0"
     webrtc-adapter "^8.1.1"
 
+"@dtelecom/react-native-webrtc@^104.0.2":
+  version "104.0.2"
+  resolved "https://registry.yarnpkg.com/@dtelecom/react-native-webrtc/-/react-native-webrtc-104.0.2.tgz#18b67c6b131464201e495ffbaf000c0a11b3cbd0"
+  integrity sha512-8GIMGzkBsfaKbq+bJyWjTGKrh2SgKZaMc2ghW5dYqyw7ZyDb1MdIUgsyuhwLdxXTZe97yEyotCv1fArwRYsYdQ==
+  dependencies:
+    adm-zip "0.5.9"
+    base64-js "1.5.1"
+    debug "4.3.4"
+    event-target-shim "6.0.2"
+    tar "6.1.11"
+
 "@eslint/eslintrc@^1.3.1":
   version "1.3.1"
   resolved "https://registry.yarnpkg.com/@eslint/eslintrc/-/eslintrc-1.3.1.tgz#de0807bfeffc37b964a7d0400e0c348ce5a2543d"
@@ -2984,17 +2995,6 @@
   dependencies:
     "@jridgewell/resolve-uri" "^3.0.3"
     "@jridgewell/sourcemap-codec" "^1.4.10"
-
-"@livekit/react-native-webrtc@^104.0.1":
-  version "104.0.1"
-  resolved "https://registry.yarnpkg.com/@livekit/react-native-webrtc/-/react-native-webrtc-104.0.1.tgz#1ff7d2db984e9b00dbf29aabca0c1f037f845415"
-  integrity sha512-mlp0gsOEOQAhAeWsTZpw+m+dcLLWXdrU5wndQ3AT8kLrIaMqgyNJw11ybpDIJNRaHVIL35oOJKYgnIllwBT4tw==
-  dependencies:
-    adm-zip "0.5.9"
-    base64-js "1.5.1"
-    debug "4.3.4"
-    event-target-shim "6.0.2"
-    tar "6.1.11"
 
 "@nodelib/fs.scandir@2.1.5":
   version "2.1.5"

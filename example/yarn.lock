@@ -1582,6 +1582,17 @@
     "@babel/helper-validator-identifier" "^7.22.20"
     to-fast-properties "^2.0.0"
 
+"@dtelecom/react-native-webrtc@^104.0.2":
+  version "104.0.2"
+  resolved "https://registry.yarnpkg.com/@dtelecom/react-native-webrtc/-/react-native-webrtc-104.0.2.tgz#18b67c6b131464201e495ffbaf000c0a11b3cbd0"
+  integrity sha512-8GIMGzkBsfaKbq+bJyWjTGKrh2SgKZaMc2ghW5dYqyw7ZyDb1MdIUgsyuhwLdxXTZe97yEyotCv1fArwRYsYdQ==
+  dependencies:
+    adm-zip "0.5.9"
+    base64-js "1.5.1"
+    debug "4.3.4"
+    event-target-shim "6.0.2"
+    tar "6.1.11"
+
 "@egjs/hammerjs@^2.0.17":
   version "2.0.17"
   resolved "https://registry.yarnpkg.com/@egjs/hammerjs/-/hammerjs-2.0.17.tgz#5dc02af75a6a06e4c2db0202cae38c9263895124"
@@ -2086,17 +2097,6 @@
   dependencies:
     "@jridgewell/resolve-uri" "3.1.0"
     "@jridgewell/sourcemap-codec" "1.4.14"
-
-"@livekit/react-native-webrtc@^104.0.1":
-  version "104.0.1"
-  resolved "https://registry.yarnpkg.com/@livekit/react-native-webrtc/-/react-native-webrtc-104.0.1.tgz#1ff7d2db984e9b00dbf29aabca0c1f037f845415"
-  integrity sha512-mlp0gsOEOQAhAeWsTZpw+m+dcLLWXdrU5wndQ3AT8kLrIaMqgyNJw11ybpDIJNRaHVIL35oOJKYgnIllwBT4tw==
-  dependencies:
-    adm-zip "0.5.9"
-    base64-js "1.5.1"
-    debug "4.3.4"
-    event-target-shim "6.0.2"
-    tar "6.1.11"
 
 "@nodelib/fs.scandir@2.1.5":
   version "2.1.5"

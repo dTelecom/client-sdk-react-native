@@ -1,41 +1,33 @@
-<!--BEGIN_BANNER_IMAGE-->
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="/.github/banner_dark.png">
-    <source media="(prefers-color-scheme: light)" srcset="/.github/banner_light.png">
-    <img style="width:100%;" alt="The LiveKit icon, the name of the repository and some sample code in the background." src="/.github/banner_light.png">
-  </picture>
-  <!--END_BANNER_IMAGE-->
+# dtelecom-react-native
 
-# livekit-react-native
-
-<!--BEGIN_DESCRIPTION-->Use this SDK to add real-time video, audio and data features to your React Native app. By connecting to a self- or cloud-hosted <a href="https://livekit.io/">LiveKit</a> server, you can quickly build applications like interactive live streaming or video calls with just a few lines of code.<!--END_DESCRIPTION-->
+<!--BEGIN_DESCRIPTION-->Use this SDK to add real-time video, audio and data features to your React Native app. By connecting to a <a href="https://video.dtelecom.org/">dTelecom</a> server, you can quickly build applications like interactive live streaming or video calls with just a few lines of code.<!--END_DESCRIPTION-->
 
 ## Installation
 
 ### NPM
 
 ```sh
-npm install @livekit/react-native @livekit/react-native-webrtc
+npm install @dtelecom/react-native @dtelecom/react-native-webrtc
 ```
 
 ### Yarn
 
 ```sh
-yarn add @livekit/react-native @livekit/react-native-webrtc
+yarn add @dtelecom/react-native @dtelecom/react-native-webrtc
 ```
 
-This library depends on `@livekit/react-native-webrtc`, which has additional installation instructions found here:
+This library depends on `@dtelecom/react-native-webrtc`, which has additional installation instructions found here:
 
-- [iOS Installation Guide](https://github.com/livekit/react-native-webrtc/blob/master/Documentation/iOSInstallation.md)
-- [Android Installation Guide](https://github.com/livekit/react-native-webrtc/blob/master/Documentation/AndroidInstallation.md)
+- [iOS Installation Guide](https://github.com/dtelecom/react-native-webrtc/blob/master/Documentation/iOSInstallation.md)
+- [Android Installation Guide](https://github.com/dtelecom/react-native-webrtc/blob/master/Documentation/AndroidInstallation.md)
 
 ---
 
-Once the `@livekit/react-native-webrtc` dependency is installed, one last step is needed to finish the installation:
+Once the `@dtelecom/react-native-webrtc` dependency is installed, one last step is needed to finish the installation:
 
 ### Android
 
-In your [MainApplication.java](https://github.com/livekit/client-sdk-react-native/blob/main/example/android/app/src/main/java/com/example/livekitreactnative/MainApplication.java) file:
+In your [MainApplication.java](https://github.com/dtelecom/client-sdk-react-native/blob/main/example/android/app/src/main/java/com/example/livekitreactnative/MainApplication.java) file:
 
 ```
 import com.livekit.reactnative.LiveKitReactNative;
@@ -57,7 +49,7 @@ public class MainApplication extends Application implements ReactApplication {
 
 ### iOS
 
-In your [AppDelegate.m](https://github.com/livekit/client-sdk-react-native/blob/main/example/ios/Dmeet/AppDelegate.mm) file:
+In your [AppDelegate.m](https://github.com/dtelecom/client-sdk-react-native/blob/main/example/ios/Dmeet/AppDelegate.mm) file:
 
 ```
 #import "LivekitReactNative.h"
@@ -73,21 +65,17 @@ In your [AppDelegate.m](https://github.com/livekit/client-sdk-react-native/blob/
 }
 ```
 
-### Expo
-
-LiveKit is available on Expo through development builds. [See the instructions found here](https://github.com/livekit/client-sdk-react-native/wiki/Expo-Development-Build-Instructions).
-
 ## Example app
 
 We've included an [example app](example/) that you can try out.
 
 ## Usage
 
-In your `index.js` file, setup the LiveKit SDK by calling `registerGlobals()`.
+In your `index.js` file, setup the dTelecom SDK by calling `registerGlobals()`.
 This sets up the required WebRTC libraries for use in Javascript, and is needed for LiveKit to work.
 
 ```js
-import { registerGlobals } from '@livekit/react-native';
+import { registerGlobals } from '@dtelecom/react-native';
 
 // ...
 
@@ -97,8 +85,8 @@ registerGlobals();
 A Room object can then be created and connected to.
 
 ```js
-import { Participant, Room, Track } from 'livekit-client';
-import { useRoom, AudioSession, VideoView } from '@livekit/react-native';
+import { Participant, Room, Track } from '@dtelecom/livekit-client';
+import { useRoom, AudioSession, VideoView } from '@dtelecom/react-native';
 
 /*...*/
 
@@ -129,9 +117,9 @@ const videoView = participants.length > 0 && (
 );
 ```
 
-[API documentation is located here.](https://htmlpreview.github.io/?https://raw.githubusercontent.com/livekit/client-sdk-react-native/main/docs/modules.html)
+[API documentation is located here.](https://htmlpreview.github.io/?https://raw.githubusercontent.com/dtelecom/client-sdk-react-native/main/docs/modules.html)
 
-Additional documentation for the LiveKit SDK can be found at https://docs.livekit.io/references/client-sdks/
+Additional documentation for the dTelecom SDK can be found at https://docs.dtelecom.org/
 
 ## Audio sessions
 
@@ -148,7 +136,7 @@ By default, the audio session is set up for bidirectional communication. In this
 - Echo cancellation is available and is enabled by default.
 - A microphone indicator can be displayed, depending on the platform.
 
-If you're leveraging LiveKit primarily for media playback, you have the option to reconfigure the audio session to better suit media playback. Here's how:
+If you're leveraging dTelecom primarily for media playback, you have the option to reconfigure the audio session to better suit media playback. Here's how:
 
 Note: iOS audio session customization is in development, and will be documented here when released.
 
@@ -261,31 +249,13 @@ You will not be able to publish camera or microphone tracks on iOS Simulator.
 
 #### Cannot read properties of undefined (reading 'split')
 
-This error could happen if you are using yarn and have incompatible versions of dependencies with livekit-client.
+This error could happen if you are using yarn and have incompatible versions of dependencies with dtelecom-client.
 
 To fix this, you can either:
 
 - use another package manager, like npm
 - use [yarn-deduplicate](https://www.npmjs.com/package/yarn-deduplicate) to deduplicate dependencies
 
-## Contributing
-
-See the [contributing guide](CONTRIBUTING.md) to learn how to contribute to the repository and the development workflow.
-
 ## License
 
 Apache License 2.0
-
-<!--BEGIN_REPO_NAV-->
-
-<br/><table>
-
-<thead><tr><th colspan="2">LiveKit Ecosystem</th></tr></thead>
-<tbody>
-<tr><td>Client SDKs</td><td><a href="https://github.com/livekit/components-js">Components</a> · <a href="https://github.com/livekit/client-sdk-js">JavaScript</a> · <a href="https://github.com/livekit/client-sdk-swift">iOS/macOS</a> · <a href="https://github.com/livekit/client-sdk-android">Android</a> · <a href="https://github.com/livekit/client-sdk-flutter">Flutter</a> · <b>React Native</b> · <a href="https://github.com/livekit/client-sdk-rust">Rust</a> · <a href="https://github.com/livekit/client-sdk-python">Python</a> · <a href="https://github.com/livekit/client-sdk-unity-web">Unity (web)</a> · <a href="https://github.com/livekit/client-sdk-unity">Unity (beta)</a></td></tr><tr></tr>
-<tr><td>Server SDKs</td><td><a href="https://github.com/livekit/server-sdk-js">Node.js</a> · <a href="https://github.com/livekit/server-sdk-go">Golang</a> · <a href="https://github.com/livekit/server-sdk-ruby">Ruby</a> · <a href="https://github.com/livekit/server-sdk-kotlin">Java/Kotlin</a> · <a href="https://github.com/agence104/livekit-server-sdk-php">PHP (community)</a> · <a href="https://github.com/tradablebits/livekit-server-sdk-python">Python (community)</a></td></tr><tr></tr>
-<tr><td>Services</td><td><a href="https://github.com/livekit/livekit">Livekit server</a> · <a href="https://github.com/livekit/egress">Egress</a> · <a href="https://github.com/livekit/ingress">Ingress</a></td></tr><tr></tr>
-<tr><td>Resources</td><td><a href="https://docs.livekit.io">Docs</a> · <a href="https://github.com/livekit-examples">Example apps</a> · <a href="https://livekit.io/cloud">Cloud</a> · <a href="https://docs.livekit.io/oss/deployment">Self-hosting</a> · <a href="https://github.com/livekit/livekit-cli">CLI</a></td></tr>
-</tbody>
-</table>
-<!--END_REPO_NAV-->
