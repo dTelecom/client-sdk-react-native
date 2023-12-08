@@ -9,8 +9,8 @@ import com.facebook.react.ReactPackage;
 import com.facebook.react.defaults.DefaultNewArchitectureEntryPoint;
 import com.facebook.react.defaults.DefaultReactNativeHost;
 import com.facebook.soloader.SoLoader;
-import com.livekit.reactnative.LiveKitReactNative;
-import com.livekit.reactnative.LivekitReactNativePackage;
+import com.livekit.reactnative.DTelecomReactNative;
+import com.livekit.reactnative.DtelecomReactNativePackage;
 
 import java.util.List;
 
@@ -29,7 +29,7 @@ public class MainApplication extends Application implements ReactApplication {
                     List<ReactPackage> packages = new PackageList(this).getPackages();
                     // Packages that cannot be autolinked yet can be added manually here, for Dmeet:
                     // packages.add(new MyReactNativePackage());
-                    packages.add(new LivekitReactNativePackage());
+                    packages.add(new DtelecomReactNativePackage());
                     return packages;
                 }
 
@@ -56,7 +56,7 @@ public class MainApplication extends Application implements ReactApplication {
 
     @Override
     public void onCreate() {
-        LiveKitReactNative.setup(this);
+        DTelecomReactNative.setup(this);
         super.onCreate();
         SoLoader.init(this, /* native exopackage */ false);
         if (BuildConfig.IS_NEW_ARCHITECTURE_ENABLED) {

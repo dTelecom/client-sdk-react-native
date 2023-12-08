@@ -8,7 +8,7 @@ import com.facebook.react.ReactPackage;
 import com.facebook.react.defaults.DefaultNewArchitectureEntryPoint;
 import com.facebook.react.defaults.DefaultReactNativeHost;
 import com.facebook.soloader.SoLoader;
-import com.livekit.reactnative.LiveKitReactNative;
+import com.livekit.reactnative.DTelecomReactNative;
 import java.util.List;
 
 public class MainApplication extends Application implements ReactApplication {
@@ -52,7 +52,7 @@ public class MainApplication extends Application implements ReactApplication {
 
   @Override
   public void onCreate() {
-    LiveKitReactNative.setup(this);
+    DTelecomReactNative.setup(this);
     super.onCreate();
     SoLoader.init(this, /* native exopackage */ false);
     if (BuildConfig.IS_NEW_ARCHITECTURE_ENABLED) {

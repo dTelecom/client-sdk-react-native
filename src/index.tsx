@@ -31,7 +31,7 @@ function livekitRegisterGlobals() {
   };
 
   // @ts-ignore
-  global.LiveKitReactNativeGlobal = lkGlobal;
+  global.DTelecomReactNativeGlobal = lkGlobal;
 }
 
 function fixWebrtcAdapter() {

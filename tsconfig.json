@@ -32,7 +32,7 @@
     "excludeProtected": true,
     "excludeExternals": true,
     "includeVersion": true,
-    "name": "LiveKit React Native Client SDK",
+    "name": "DTelecom React Native Client SDK",
     "out": "docs",
     "theme": "default"
   }

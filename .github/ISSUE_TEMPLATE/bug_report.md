@@ -3,7 +3,6 @@ name: Bug report
 about: Create a report to help us improve
 title: ''
 labels: bug
-assignees: davidliu
 
 ---
 
@@ -34,9 +33,9 @@ If applicable, add screenshots to help explain your problem.
 
 **Dependencies Info (please reference your package-lock.json or yarn.lock file):**
 
- - @livekit/react-native: [e.g. commit hash]
- - livekit-client: [e.g. 1.6.0]
- - react-native-webrtc: [e.g. 106.0.0]
+ - @dtelecom/react-native: [e.g. commit hash]
+ - @dtelecom/livekit-client: [e.g. 1.6.0]
+ - @dtelelcom/react-native-webrtc: [e.g. 106.0.0]
 
 **Additional context**
 Add any other context about the problem here.

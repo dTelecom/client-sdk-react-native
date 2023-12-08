@@ -1,5 +1,5 @@
 #import <React/RCTBridgeModule.h>
-#import "LivekitReactNative.h"
+#import "DtelecomReactNative.h"
 #import "WebRTCModule.h"
 #import "WebRTCModuleOptions.h"
 #import <WebRTC/RTCAudioSession.h>
@@ -7,12 +7,12 @@
 #import <AVFAudio/AVFAudio.h>
 #import <AVKit/AVKit.h>
 
-@implementation LivekitReactNative
+@implementation DtelecomReactNative
 RCT_EXPORT_MODULE();
 
 -(instancetype)init {
     if(self = [super init]) {
-        
+
         RTCAudioSessionConfiguration* config = [[RTCAudioSessionConfiguration alloc] init];
         [config setCategory:AVAudioSessionCategoryPlayAndRecord];
         [config setCategoryOptions:
@@ -46,15 +46,15 @@ RCT_EXPORT_METHOD(configureAudio:(NSDictionary *) config){
     if(iOSConfig == nil) {
         return;
     }
-    
+
     NSString * defaultOutput = [iOSConfig objectForKey:@"defaultOutput"];
     if (defaultOutput == nil) {
         defaultOutput = @"speaker";
     }
-    
+
     RTCAudioSessionConfiguration* rtcConfig = [[RTCAudioSessionConfiguration alloc] init];
     [rtcConfig setCategory:AVAudioSessionCategoryPlayAndRecord];
-    
+
     if([defaultOutput isEqualToString:@"earpiece"]){
         [rtcConfig setCategoryOptions:
          AVAudioSessionCategoryOptionAllowAirPlay|
@@ -76,7 +76,7 @@ RCT_EXPORT_METHOD(startAudioSession){
 }
 
 RCT_EXPORT_METHOD(stopAudioSession){
-    
+
 }
 
 RCT_EXPORT_METHOD(showAudioRoutePicker){
@@ -101,16 +101,16 @@ RCT_EXPORT_METHOD(getAudioOutputsWithResolver:(RCTPromiseResolveBlock)resolve
 RCT_EXPORT_METHOD(selectAudioOutput:(NSString *)deviceId
                   withResolver:(RCTPromiseResolveBlock)resolve
                   withRejecter:(RCTPromiseRejectBlock)reject){
-    
+
     AVAudioSession *session = [AVAudioSession sharedInstance];
     NSError *error = nil;
-    
+
     if ([deviceId isEqualToString:@"default"]) {
         [session overrideOutputAudioPort:AVAudioSessionPortOverrideNone error:&error];
     } else if ([deviceId isEqualToString:@"force_speaker"]) {
         [session overrideOutputAudioPort:AVAudioSessionPortOverrideSpeaker error:&error];
     }
-    
+
     if (error != nil) {
         reject(@"selectAudioOutput error", error.localizedDescription, error);
     } else {

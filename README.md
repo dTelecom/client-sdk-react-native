@@ -30,7 +30,7 @@ Once the `@dtelecom/react-native-webrtc` dependency is installed, one last step 
 In your [MainApplication.java](https://github.com/dtelecom/client-sdk-react-native/blob/main/example/android/app/src/main/java/com/example/livekitreactnative/MainApplication.java) file:
 
 ```
-import com.livekit.reactnative.LiveKitReactNative;
+import com.livekit.reactnative.DTelecomReactNative;
 import com.livekit.reactnative.audio.AudioType;
 
 public class MainApplication extends Application implements ReactApplication {
@@ -40,7 +40,7 @@ public class MainApplication extends Application implements ReactApplication {
     // Place this above any other RN related initialization
     // When AudioType is omitted, it'll default to CommunicationAudioType
     // use MediaAudioType if user is only consuming audio, and not publishing
-    LiveKitReactNative.setup(this, new AudioType.CommunicationAudioType());
+    DTelecomReactNative.setup(this, new AudioType.CommunicationAudioType());
 
     //...
   }
@@ -52,14 +52,14 @@ public class MainApplication extends Application implements ReactApplication {
 In your [AppDelegate.m](https://github.com/dtelecom/client-sdk-react-native/blob/main/example/ios/Dmeet/AppDelegate.mm) file:
 
 ```
-#import "LivekitReactNative.h"
+#import "DtelecomReactNative.h"
 
 @implementation AppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
   // Place this above any other RN related initialization
-  [LivekitReactNative setup];
+  [DtelecomReactNative setup];
 
   //...
 }

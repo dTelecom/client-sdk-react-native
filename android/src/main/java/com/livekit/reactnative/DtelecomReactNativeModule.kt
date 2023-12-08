@@ -8,11 +8,11 @@ import com.livekit.reactnative.audio.AudioManagerUtils
 import com.livekit.reactnative.audio.AudioSwitchManager
 
 
-class LivekitReactNativeModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
+class DtelecomReactNativeModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
 
     val audioManager = AudioSwitchManager(reactContext.applicationContext)
     override fun getName(): String {
-        return "LivekitReactNative"
+        return "DtelecomReactNative"
     }
 
     @ReactMethod

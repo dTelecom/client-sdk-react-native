@@ -9,7 +9,7 @@ import com.livekit.reactnative.video.WrappedVideoDecoderFactoryProxy
 import com.oney.WebRTCModule.WebRTCModuleOptions
 import org.webrtc.audio.JavaAudioDeviceModule
 
-object LiveKitReactNative {
+object DTelecomReactNative {
 
     /**
      * Initializes components required for LiveKit to work on Android.

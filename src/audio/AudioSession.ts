@@ -1,12 +1,12 @@
 import { NativeModules, Platform } from 'react-native';
 const LINKING_ERROR =
-  `The package '@livekit/react-native' doesn't seem to be linked. Make sure: \n\n` +
+  `The package '@dtelecom/react-native' doesn't seem to be linked. Make sure: \n\n` +
   Platform.select({ ios: "- You have run 'pod install'\n", default: '' }) +
   '- You rebuilt the app after installing the package\n' +
   '- You are not using Expo managed workflow\n';
 
-const LivekitReactNative = NativeModules.LivekitReactNative
-  ? NativeModules.LivekitReactNative
+const DtelecomReactNative = NativeModules.DtelecomReactNative
+  ? NativeModules.DtelecomReactNative
   : new Proxy(
       {},
       {
@@ -186,21 +186,21 @@ export default class AudioSession {
    * Must be called prior to connecting to a Room for the configuration to apply correctly.
    */
   static configureAudio = async (config: AudioConfiguration) => {
-    await LivekitReactNative.configureAudio(config);
+    await DtelecomReactNative.configureAudio(config);
   };
 
   /**
    * Starts an AudioSession.
    */
   static startAudioSession = async () => {
-    await LivekitReactNative.startAudioSession();
+    await DtelecomReactNative.startAudioSession();
   };
 
   /**
    * Stops the existing AudioSession.
    */
   static stopAudioSession = async () => {
-    await LivekitReactNative.stopAudioSession();
+    await DtelecomReactNative.stopAudioSession();
   };
 
   /**
@@ -231,7 +231,7 @@ export default class AudioSession {
     if (Platform.OS === 'ios') {
       return ['default', 'force_speaker'];
     } else if (Platform.OS === 'android') {
-      return (await LivekitReactNative.getAudioOutputs()) as string[];
+      return (await DtelecomReactNative.getAudioOutputs()) as string[];
     } else {
       return [];
     }
@@ -245,7 +245,7 @@ export default class AudioSession {
    * @param deviceId A deviceId retrieved from {@link getAudioOutputs}
    */
   static selectAudioOutput = async (deviceId: string) => {
-    await LivekitReactNative.selectAudioOutput(deviceId);
+    await DtelecomReactNative.selectAudioOutput(deviceId);
   };
 
   /**
@@ -255,7 +255,7 @@ export default class AudioSession {
    */
   static showAudioRoutePicker = async () => {
     if (Platform.OS === 'ios') {
-      await LivekitReactNative.showAudioRoutePicker();
+      await DtelecomReactNative.showAudioRoutePicker();
     }
   };
 }
