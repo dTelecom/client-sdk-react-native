@@ -1,25 +1,27 @@
-# dtelecom-react-native
+# dTelecom React Native SDK 1.x (legacy)
 
-<!--BEGIN_DESCRIPTION-->Use this SDK to add real-time video, audio and data features to your React Native app. By connecting to a <a href="https://video.dtelecom.org/">dTelecom</a> server, you can quickly build applications like interactive live streaming or video calls with just a few lines of code.<!--END_DESCRIPTION-->
+<!--BEGIN_DESCRIPTION-->`@dtelecom/react-native@1.3.0` and its `@dtelecom/react-native-webrtc` 104.x dependency are legacy releases for existing integrations. They are unsupported for new dTelecom Cloud apps.<!--END_DESCRIPTION-->
 
-## Installation
+For new apps that can use a browser, follow the [web quickstart](https://docs.dtelecom.org/quickstart/). Check the [SDK catalog](https://docs.dtelecom.org/reference/sdks/) for public React Native availability.
+
+## Installation for existing 1.3.0 apps
 
 ### NPM
 
 ```sh
-npm install @dtelecom/react-native @dtelecom/react-native-webrtc
+npm install @dtelecom/react-native@1.3.0 @dtelecom/react-native-webrtc@104.0.2
 ```
 
 ### Yarn
 
 ```sh
-yarn add @dtelecom/react-native @dtelecom/react-native-webrtc
+yarn add @dtelecom/react-native@1.3.0 @dtelecom/react-native-webrtc@104.0.2
 ```
 
 This library depends on `@dtelecom/react-native-webrtc`, which has additional installation instructions found here:
 
-- [iOS Installation Guide](https://github.com/dtelecom/react-native-webrtc/blob/master/Documentation/iOSInstallation.md)
-- [Android Installation Guide](https://github.com/dtelecom/react-native-webrtc/blob/master/Documentation/AndroidInstallation.md)
+- [iOS Installation Guide for 104.x](https://github.com/dTelecom/react-native-webrtc/blob/v104.0/Documentation/iOSInstallation.md)
+- [Android Installation Guide for 104.x](https://github.com/dTelecom/react-native-webrtc/blob/v104.0/Documentation/AndroidInstallation.md)
 
 ---
 
@@ -27,10 +29,10 @@ Once the `@dtelecom/react-native-webrtc` dependency is installed, one last step 
 
 ### Android
 
-In your [MainApplication.java](https://github.com/dtelecom/client-sdk-react-native/blob/main/example/android/app/src/main/java/com/example/livekitreactnative/MainApplication.java) file:
+In `MainApplication.java`, use the class name shipped in the 1.3.0 npm package.
 
 ```
-import com.livekit.reactnative.DTelecomReactNative;
+import com.livekit.reactnative.LiveKitReactNative;
 import com.livekit.reactnative.audio.AudioType;
 
 public class MainApplication extends Application implements ReactApplication {
@@ -40,7 +42,7 @@ public class MainApplication extends Application implements ReactApplication {
     // Place this above any other RN related initialization
     // When AudioType is omitted, it'll default to CommunicationAudioType
     // use MediaAudioType if user is only consuming audio, and not publishing
-    DTelecomReactNative.setup(this, new AudioType.CommunicationAudioType());
+    LiveKitReactNative.setup(this, new AudioType.CommunicationAudioType());
 
     //...
   }
@@ -49,17 +51,17 @@ public class MainApplication extends Application implements ReactApplication {
 
 ### iOS
 
-In your [AppDelegate.m](https://github.com/dtelecom/client-sdk-react-native/blob/main/example/ios/Dmeet/AppDelegate.mm) file:
+In your app delegate, use the Objective-C header shipped in the 1.3.0 npm package.
 
 ```
-#import "DtelecomReactNative.h"
+#import "LivekitReactNative.h"
 
 @implementation AppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
   // Place this above any other RN related initialization
-  [DtelecomReactNative setup];
+  [LivekitReactNative setup];
 
   //...
 }
@@ -67,7 +69,7 @@ In your [AppDelegate.m](https://github.com/dtelecom/client-sdk-react-native/blob
 
 ## Example app
 
-We've included an [example app](example/) that you can try out.
+The [example app](example/) uses the historical dMeet authentication flow. For a new Cloud integration, your backend issues the participant token and returns its matching node URL. [Connection guide](https://docs.dtelecom.org/rooms/connect/)
 
 ## Usage
 
