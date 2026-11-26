@@ -12,7 +12,7 @@
   },
   "dependencies": {
     "@dtelecom/livekit-client": "1.12.28",
-    "@dtelecom/react-native": "2.0.0",
+    "@dtelecom/react-native": "2.0.1",
     "@dtelecom/react-native-webrtc": "150.2.0-preview.0",
     "react": "19.2.3",
     "react-native": "0.86.0",

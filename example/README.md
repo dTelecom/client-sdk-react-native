@@ -9,7 +9,7 @@ Use Node 22.13 or newer within Node 22, React Native 0.86, Xcode with CocoaPods 
 With the published SDK, run `npm ci` from this directory. To test a locally packed wrapper, run the command below in this directory. npm installs the pinned room client and WebRTC bridge from the registry.
 
 ```sh
-npm install --no-save /absolute/path/to/dtelecom-react-native-2.0.0.tgz
+npm install --no-save /absolute/path/to/dtelecom-react-native-2.0.1.tgz
 ```
 
 For iOS, run `bundle install`, then `cd ios && bundle exec pod install` and return to the example directory. The Podfile includes the LiveKit source for the pinned WebRTC framework. Start Metro with `npm start`, then use `npm run ios` or `npm run android` in another terminal. Run `npm test` to check the invite and chat contracts.

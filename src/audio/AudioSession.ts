@@ -12,6 +12,8 @@ export type AudioOutput =
 export type AudioRoute = {
   selectedOutput: AudioOutput;
   availableOutputs: AudioOutput[];
+  /** Manual iOS routing actions supported by the current audio session category. */
+  selectableOutputs?: ('default' | 'force_speaker')[];
 };
 let preferSpeaker = true;
 let sessionStarted = false;
@@ -31,7 +33,12 @@ function configureAppleSession() {
   AudioDeviceModule.setAutomaticAudioSessionConfiguration({
     recording,
     playout: preferSpeaker
-      ? { audioCategory: 'playback', audioMode: 'default' }
+      ? {
+          audioCategory: 'playback',
+          audioMode: 'default',
+          // WebRTC otherwise keeps recording-only Bluetooth options in playback.
+          audioCategoryOptions: [],
+        }
       : recording,
     deactivateOnStop: true,
   });
@@ -269,7 +276,8 @@ export default class AudioSession {
    *
    * ----
    *
-   * For iOS, due to OS limitations, the only available types are:
+   * On iOS, playback uses the system route picker. The playAndRecord category
+   * also supports these manual actions:
    * * "default" - Use default iOS audio routing
    * * "force_speaker" - Force audio output through speaker
    *
@@ -282,7 +290,7 @@ export default class AudioSession {
    */
   static getAudioOutputs = async (): Promise<string[]> => {
     if (Platform.OS === 'ios') {
-      return ['default', 'force_speaker'];
+      return (await AudioSession.getAudioRoute()).selectableOutputs ?? [];
     } else if (Platform.OS === 'android') {
       return (await DtelecomReactNative.getAudioOutputs()) as string[];
     } else {

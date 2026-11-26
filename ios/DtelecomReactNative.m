@@ -49,6 +49,10 @@ static NSString *outputKind(AVAudioSessionPort port) {
     return @"other";
 }
 
+static BOOL supportsSpeakerOverride(void) {
+    return [[AVAudioSession sharedInstance].category isEqualToString:AVAudioSessionCategoryPlayAndRecord];
+}
+
 - (NSDictionary *)currentRoute {
     AVAudioSession *session = [AVAudioSession sharedInstance];
     NSMutableOrderedSet *available = [NSMutableOrderedSet orderedSetWithObject:@"speaker"];
@@ -60,7 +64,9 @@ static NSString *outputKind(AVAudioSessionPort port) {
         [available addObject:outputKind(output.portType)];
     }
     AVAudioSessionPortDescription *output = session.currentRoute.outputs.firstObject;
-    return @{@"availableOutputs": available.array, @"selectedOutput": output ? outputKind(output.portType) : @"unknown"};
+    return @{@"availableOutputs": available.array,
+             @"selectedOutput": output ? outputKind(output.portType) : @"unknown",
+             @"selectableOutputs": supportsSpeakerOverride() ? @[@"default", @"force_speaker"] : @[]};
 }
 
 - (void)routeChanged:(NSNotification *)notification {
@@ -83,8 +89,11 @@ RCT_EXPORT_METHOD(selectAudioOutput:(NSString *)deviceId
     LKRTCAudioSession *session = [LKRTCAudioSession sharedInstance];
     [session lockForConfiguration];
     NSError *error = nil;
-    BOOL success = [session overrideOutputAudioPort:speaker ? AVAudioSessionPortOverrideSpeaker : AVAudioSessionPortOverrideNone
+    BOOL success = NO;
+    if (supportsSpeakerOverride()) {
+        success = [session overrideOutputAudioPort:speaker ? AVAudioSessionPortOverrideSpeaker : AVAudioSessionPortOverrideNone
                                              error:&error];
+    }
     [session unlockForConfiguration];
     if (error) reject(@"audio_route", error.localizedDescription, error);
     else resolve(@(success));

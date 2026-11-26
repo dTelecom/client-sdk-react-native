@@ -1,5 +1,5 @@
 PODS:
-  - dtelecom-react-native (2.0.0):
+  - dtelecom-react-native (2.0.1):
     - dtelecom-react-native-webrtc (= 150.2.0-preview.0)
     - React-Core
   - dtelecom-react-native-webrtc (150.2.0-preview.0):
@@ -2171,7 +2171,7 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon/yoga"
 
 SPEC CHECKSUMS:
-  dtelecom-react-native: 349973bc64630f39581700d0ad047613a8bae7d2
+  dtelecom-react-native: b4362f635562a72c3ee313c3c1e4ba1cfd119a73
   dtelecom-react-native-webrtc: 19514ca2e42500a898facb551cc676f3eb3393e6
   FBLazyVector: b3e7ad108f0d882e30445c5527d774e3fd432f3d
   hermes-engine: bef4fcf2f625443b080d153fcd1fe91304c2f479

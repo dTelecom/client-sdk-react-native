@@ -7,13 +7,13 @@ The dTelecom React Native SDK 2.0 for iOS and Android connects to dTelecom rooms
 Use React Native 0.86, React 19.2.3 and Node 22.13 or later within Node 22. The SDK supports iOS 15.1 or later and Android API 24 or later. npm resolves its pinned room client (1.12.28) and WebRTC bridge (150.2.0-preview.0) automatically.
 
 ```sh
-npm install @dtelecom/react-native@2.0.0
+npm install @dtelecom/react-native@2.0.1
 ```
 
 To test a local wrapper build, use its tarball path in the install command. npm downloads both peers from the registry.
 
 ```sh
-npm install --no-save /absolute/path/to/dtelecom-react-native-2.0.0.tgz
+npm install --no-save /absolute/path/to/dtelecom-react-native-2.0.1.tgz
 ```
 
 On iOS, include both sources in your Podfile and run `bundle exec pod install` from the iOS directory. The first source supplies the pinned WebRTC binary. Add camera and microphone usage descriptions if the app offers capture.

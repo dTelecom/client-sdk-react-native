@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { AppState, PermissionsAndroid, Platform, ScrollView, Text, TextInput, View } from 'react-native';
 import {
   AudioSession, ConnectionState, connectRoom, DataPacket_Kind, Room, RoomEvent,
-  switchCamera, useParticipant, useRoom, VideoView, type Participant, type RemoteParticipant,
+  switchCamera, useParticipant, useRoom, VideoView, type AudioRoute, type Participant, type RemoteParticipant,
 } from '@dtelecom/react-native';
 import type { Session } from '../App';
 import { chatTopic, decodeChat, encodeChat } from './chat';
@@ -72,21 +72,18 @@ export function RoomPage({ session, onLeave }: { session: Session; onLeave: () =
       if (text) setMessages(previous => [...previous, { sender: sender?.name || sender?.identity || 'Participant', text }]);
     };
     room.on(RoomEvent.DataReceived, receive);
-    const routes = AudioSession.addAudioRouteChangeListener(route => {
+    const updateRoute = (route: AudioRoute) => {
       if (!active.current) return;
       setCurrentOutput(route.selectedOutput);
-      if (Platform.OS === 'android') setOutputs(route.availableOutputs);
-    });
+      setOutputs(Platform.OS === 'ios' ? route.selectableOutputs ?? [] : route.availableOutputs);
+    };
+    const routes = AudioSession.addAudioRouteChangeListener(updateRoute);
     setup.current = (async () => {
       await AudioSession.startAudioSession();
       if (!active.current) return;
       await connectRoom(room, admission);
       if (!active.current) return;
-      const [actions, route] = await Promise.all([AudioSession.getAudioOutputs(), AudioSession.getAudioRoute()]);
-      if (active.current) {
-        setOutputs(actions);
-        setCurrentOutput(route.selectedOutput);
-      }
+      updateRoute(await AudioSession.getAudioRoute());
     })().catch(report);
 
     let restoreCamera = false;
