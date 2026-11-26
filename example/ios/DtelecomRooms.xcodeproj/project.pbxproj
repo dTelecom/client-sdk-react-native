@@ -273,7 +273,7 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = org.dtelecom.rooms;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.example.dtelecomrooms$(DEVELOPMENT_TEAM)";
 				PRODUCT_NAME = DtelecomRooms;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -302,7 +302,7 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = org.dtelecom.rooms;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.example.dtelecomrooms$(DEVELOPMENT_TEAM)";
 				PRODUCT_NAME = DtelecomRooms;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SWIFT_VERSION = 5.0;

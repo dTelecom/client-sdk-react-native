@@ -1,9 +1,27 @@
 import assert from 'node:assert/strict';
 import { test, mock } from 'node:test';
-import { parseInvite, joinInvite } from '../src/invite.ts';
+import { parseInvite, joinInvite, readInviteQR } from '../src/invite.ts';
 import { decodeChat, encodeChat } from '../src/chat.ts';
 
 const trusted = { 'https://meet.example': 'meet', 'https://live.example': 'live' } as const;
+test('the shipped issuer list accepts public Meet and Live invites', () => {
+  for (const [origin, product] of [
+    ['https://dtelecom-meet.vercel.app', 'meet'],
+    ['https://dtelecom-live.vercel.app', 'live'],
+  ]) {
+    const invite = parseInvite(origin + '/prejoin?room=weekly%20call#host=signature');
+    assert.deepEqual(invite, { origin, product, room: 'weekly call', hostKey: 'signature' });
+  }
+});
+
+test('QR scans preserve the original invite, including the signed host fragment', () => {
+  const invite = 'https://dtelecom-live.vercel.app/prejoin?room=A%20B#host=abc%2Bdef%3D';
+  assert.equal(readInviteQR(invite), invite);
+  assert.equal(parseInvite(readInviteQR(invite)).hostKey, 'abc+def=');
+  assert.throws(() => readInviteQR('https://other.example/prejoin?room=A'));
+  assert.throws(() => readInviteQR('https://dtelecom-meet.vercel.app/other?room=A'));
+});
+
 test('host key is read only from fragment on a configured origin', () => {
   const invite = parseInvite('https://meet.example/prejoin?room=A%20B#host=signature', trusted);
   assert.deepEqual(invite, {origin: 'https://meet.example', product: 'meet', room: 'A B', hostKey: 'signature'});

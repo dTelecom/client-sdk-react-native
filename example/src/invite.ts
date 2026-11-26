@@ -3,7 +3,7 @@ export type Role = 'host' | 'guest' | 'viewer';
 export type Issuers = Readonly<Record<string, Product>>;
 
 export const issuers: Issuers = {
-  'https://dtelecom-meet-demo.vercel.app': 'meet',
+  'https://dtelecom-meet.vercel.app': 'meet',
   'https://dtelecom-live.vercel.app': 'live',
 };
 
@@ -40,6 +40,11 @@ export function parseInvite(link: string, trusted: Issuers = issuers): Invite {
   }
   const hostKey = new URLSearchParams(url.hash.slice(1)).get('host') || undefined;
   return { origin: url.origin, product, room, hostKey };
+}
+
+export function readInviteQR(value: string): string {
+  parseInvite(value);
+  return value;
 }
 
 export async function joinInvite(invite: Invite, name: string, signal: AbortSignal): Promise<Admission> {

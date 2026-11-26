@@ -1,7 +1,8 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { KeyboardAvoidingView, Platform, ScrollView, StatusBar, Text, TextInput, View } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { joinInvite, parseInvite, type Admission } from './src/invite';
+import { InviteScanner } from './src/InviteScanner';
 import { RoomPage } from './src/RoomPage';
 import { Action, colors, styles } from './src/ui';
 
@@ -15,9 +16,16 @@ function JoinPage() {
   const [link, setLink] = useState('');
   const [identity, setIdentity] = useState('');
   const [error, setError] = useState('');
+  const [scanning, setScanning] = useState(false);
   const [joining, setJoining] = useState(false);
   const request = useRef<AbortController | null>(null);
   useEffect(() => () => request.current?.abort(), []);
+
+  const finishScan = useCallback((invite?: string, message?: string) => {
+    if (invite !== undefined) setLink(invite);
+    setError(message ?? '');
+    setScanning(false);
+  }, []);
 
   async function join() {
     if (request.current) return;
@@ -39,6 +47,7 @@ function JoinPage() {
     }
   }
 
+  if (scanning) return <InviteScanner onClose={finishScan} />;
   if (session) {
     return <RoomPage session={session} onLeave={() => setSession(undefined)} />;
   }
@@ -50,6 +59,7 @@ function JoinPage() {
         <TextInput testID="invite" accessibilityLabel="Meet or Live invite" style={styles.input}
           editable={!joining} autoCapitalize="none" autoCorrect={false} keyboardType="url"
           placeholder="Paste an invite link" placeholderTextColor={colors.muted} value={link} onChangeText={setLink} />
+        <Action label="Scan QR" disabled={joining} onPress={() => setScanning(true)} />
       </View>
       <View style={styles.field}>
         <Text style={styles.label}>Your name</Text>

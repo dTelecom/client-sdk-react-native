@@ -79,7 +79,7 @@ android {
 
     namespace "org.dtelecom.rooms"
     defaultConfig {
-        applicationId "org.dtelecom.rooms"
+        applicationId "com.example.dtelecomrooms"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

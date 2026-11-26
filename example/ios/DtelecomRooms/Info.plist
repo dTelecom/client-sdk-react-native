@@ -70,7 +70,7 @@
 		</dict>
 	</dict>
 	<key>NSCameraUsageDescription</key>
-	<string>Share video in meetings and broadcasts.</string>
+	<string>Scan invite QR codes and share video in meetings and broadcasts.</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Share audio in meetings and broadcasts.</string>
 </dict>
