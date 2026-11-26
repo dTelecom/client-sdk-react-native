@@ -1,4 +1,42 @@
-import { NativeModules, Platform } from 'react-native';
+import { NativeEventEmitter, NativeModules, Platform } from 'react-native';
+import { AudioDeviceModule } from '@dtelecom/react-native-webrtc';
+import type { AutomaticAppleAudioConfiguration } from '@dtelecom/react-native-webrtc';
+
+export type AudioOutput =
+  | 'speaker'
+  | 'earpiece'
+  | 'bluetooth'
+  | 'headset'
+  | 'other'
+  | 'unknown';
+export type AudioRoute = {
+  selectedOutput: AudioOutput;
+  availableOutputs: AudioOutput[];
+};
+let preferSpeaker = true;
+let sessionStarted = false;
+let routeEvents: NativeEventEmitter | undefined;
+
+function configureAppleSession() {
+  const recording: AutomaticAppleAudioConfiguration = {
+    audioCategory: 'playAndRecord',
+    audioMode: preferSpeaker ? 'videoChat' : 'voiceChat',
+    audioCategoryOptions: [
+      'allowBluetooth',
+      'allowBluetoothA2DP',
+      'allowAirPlay',
+    ],
+  };
+  if (preferSpeaker) recording.audioCategoryOptions?.push('defaultToSpeaker');
+  AudioDeviceModule.setAutomaticAudioSessionConfiguration({
+    recording,
+    playout: preferSpeaker
+      ? { audioCategory: 'playback', audioMode: 'default' }
+      : recording,
+    deactivateOnStop: true,
+  });
+}
+
 const LINKING_ERROR =
   `The package '@dtelecom/react-native' doesn't seem to be linked. Make sure: \n\n` +
   Platform.select({ ios: "- You have run 'pod install'\n", default: '' }) +
@@ -46,7 +84,7 @@ const DtelecomReactNative = NativeModules.DtelecomReactNative
 export type AudioConfiguration = {
   android?: {
     preferredOutputList?: ('speaker' | 'earpiece' | 'headset' | 'bluetooth')[];
-    audioTypeOptions: AndroidAudioTypeOptions;
+    audioTypeOptions?: AndroidAudioTypeOptions;
   };
   ios?: {
     defaultOutput?: 'speaker' | 'earpiece';
@@ -186,21 +224,36 @@ export default class AudioSession {
    * Must be called prior to connecting to a Room for the configuration to apply correctly.
    */
   static configureAudio = async (config: AudioConfiguration) => {
-    await DtelecomReactNative.configureAudio(config);
+    if (Platform.OS === 'ios') {
+      if (config.ios) preferSpeaker = config.ios.defaultOutput !== 'earpiece';
+      if (sessionStarted) configureAppleSession();
+    } else if (Platform.OS === 'android') {
+      await DtelecomReactNative.configureAudio(config);
+    }
   };
 
   /**
    * Starts an AudioSession.
    */
   static startAudioSession = async () => {
-    await DtelecomReactNative.startAudioSession();
+    if (Platform.OS === 'ios') {
+      configureAppleSession();
+      sessionStarted = true;
+    } else if (Platform.OS === 'android') {
+      await DtelecomReactNative.startAudioSession();
+    }
   };
 
   /**
    * Stops the existing AudioSession.
    */
   static stopAudioSession = async () => {
-    await DtelecomReactNative.stopAudioSession();
+    if (Platform.OS === 'ios') {
+      sessionStarted = false;
+      AudioDeviceModule.setAutomaticAudioSessionConfiguration(null);
+    } else if (Platform.OS === 'android') {
+      await DtelecomReactNative.stopAudioSession();
+    }
   };
 
   /**
@@ -244,9 +297,26 @@ export default class AudioSession {
    *
    * @param deviceId A deviceId retrieved from {@link getAudioOutputs}
    */
-  static selectAudioOutput = async (deviceId: string) => {
-    await DtelecomReactNative.selectAudioOutput(deviceId);
+  static selectAudioOutput = async (deviceId: string): Promise<boolean> => {
+    return DtelecomReactNative.selectAudioOutput(deviceId);
   };
+
+  /** Reports the active output and the device kinds currently available. */
+  static getAudioRoute = async (): Promise<AudioRoute> =>
+    DtelecomReactNative.getAudioRoute();
+
+  static addAudioRouteChangeListener = (
+    listener: (route: AudioRoute) => void
+  ) => {
+    routeEvents ??= new NativeEventEmitter(DtelecomReactNative);
+    return routeEvents.addListener('dTelecomAudioRouteChanged', listener);
+  };
+
+  /** Returns output selection to the platform's automatic routing. */
+  static clearAudioOutputSelection = async (): Promise<boolean> =>
+    Platform.OS === 'ios'
+      ? AudioSession.selectAudioOutput('default')
+      : DtelecomReactNative.clearAudioOutputSelection();
 
   /**
    * iOS only, requires iOS 11+.

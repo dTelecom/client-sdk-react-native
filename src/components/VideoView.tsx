@@ -1,6 +1,10 @@
-import * as React from 'react';
-
-import { LayoutChangeEvent, StyleSheet, View, ViewStyle } from 'react-native';
+import {
+  LayoutChangeEvent,
+  StyleProp,
+  StyleSheet,
+  View,
+  ViewStyle,
+} from 'react-native';
 import {
   ElementInfo,
   LocalVideoTrack,
@@ -9,16 +13,18 @@ import {
   VideoTrack,
 } from '@dtelecom/livekit-client';
 import { RTCView } from '@dtelecom/react-native-webrtc';
-import { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { RemoteVideoTrack } from '@dtelecom/livekit-client';
 import ViewPortDetector from './ViewPortDetector';
 
 export type Props = {
   videoTrack?: VideoTrack | undefined;
-  style?: ViewStyle;
+  style?: StyleProp<ViewStyle>;
   objectFit?: 'cover' | 'contain' | undefined;
   mirror?: boolean;
   zOrder?: number;
+  /** Android. Composite this track into the view hierarchy for rounded or overlapping tiles. */
+  useTextureView?: boolean;
 };
 
 export const VideoView = ({
@@ -27,14 +33,15 @@ export const VideoView = ({
   objectFit = 'cover',
   zOrder,
   mirror,
-}: Props) => {
-  const [elementInfo] = useState(() => {
-    let info = new VideoViewElementInfo();
-    info.id = videoTrack?.sid;
-    info.something = videoTrack;
-    return info;
-  });
-
+  useTextureView,
+}: Props): React.ReactElement => {
+  const [elementInfo] = useState(() => new VideoViewElementInfo());
+  const onVisibility = useCallback(
+    (visible: boolean) => elementInfo.onVisibility(visible),
+    [elementInfo]
+  );
+  const adaptive =
+    videoTrack instanceof RemoteVideoTrack && videoTrack.isAdaptiveStream;
   const [mediaStream, setMediaStream] = useState(videoTrack?.mediaStream);
   useEffect(() => {
     setMediaStream(videoTrack?.mediaStream);
@@ -47,9 +54,8 @@ export const VideoView = ({
       return () => {
         videoTrack.off(TrackEvent.Restarted, onRestarted);
       };
-    } else {
-      return () => {};
     }
+    return undefined;
   }, [videoTrack]);
 
   useEffect(() => {
@@ -58,32 +64,33 @@ export const VideoView = ({
       return () => {
         videoTrack?.stopObservingElementInfo(elementInfo);
       };
-    } else {
-      return () => {};
     }
+    return undefined;
   }, [videoTrack, elementInfo]);
 
   return (
     <View
-      style={{ ...style, ...styles.container }}
+      style={style}
       onLayout={(event) => {
         elementInfo.onLayout(event);
       }}
     >
       <ViewPortDetector
-        onChange={(isVisible: boolean) => elementInfo.onVisibility(isVisible)}
+        disabled={!adaptive}
+        onChange={onVisibility}
         style={styles.videoView}
       >
         <RTCView
-          // eslint-disable-next-line react-native/no-inline-styles
-          style={{
-            flex: 1,
-            width: '100%',
-          }}
-          streamURL={mediaStream?.toURL() ?? ''}
+          style={styles.videoView}
+          streamURL={(
+            mediaStream as
+              | (typeof mediaStream & { toURL(): string })
+              | undefined
+          )?.toURL()}
           objectFit={objectFit}
           zOrder={zOrder}
           mirror={mirror}
+          useTextureView={useTextureView}
         />
       </ViewPortDetector>
     </View>
@@ -91,7 +98,6 @@ export const VideoView = ({
 };
 
 const styles = StyleSheet.create({
-  container: {},
   videoView: {
     flex: 1,
     width: '100%',
@@ -100,8 +106,6 @@ const styles = StyleSheet.create({
 
 class VideoViewElementInfo implements ElementInfo {
   element: object = {};
-  something?: any;
-  id?: string;
   _width = 0;
   _height = 0;
   _observing = false;

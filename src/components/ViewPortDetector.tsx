@@ -1,95 +1,62 @@
-'use strict';
+import React, { useEffect, useRef } from 'react';
+import { AppState, Dimensions, View } from 'react-native';
+import type { PropsWithChildren } from 'react';
+import type { StyleProp, ViewStyle } from 'react-native';
 
-import React, { Component, PropsWithChildren } from 'react';
-import { View, ViewStyle } from 'react-native';
-
-export type Props = {
+type Props = PropsWithChildren<{
   disabled?: boolean;
-  style?: ViewStyle;
-  onChange?: (isVisible: boolean) => void;
-  delay?: number;
-};
+  style?: StyleProp<ViewStyle>;
+  onChange: (visible: boolean) => void;
+}>;
 
-/**
- * Detects when this is in the viewport and visible.
- *
- * Will not fire visibility changes for zero width/height components.
- */
-export default class ViewPortDetector extends Component<
-  PropsWithChildren<Props>
-> {
-  private lastValue: boolean | null = null;
-  private interval: any | null = null;
-  private view: View | null = null;
-
-  constructor(props: Props) {
-    super(props);
-    this.state = { rectTop: 0, rectBottom: 0 };
-  }
-
-  componentDidMount() {
-    if (!this.props.disabled) {
-      this.startWatching();
-    }
-  }
-
-  componentWillUnmount() {
-    this.stopWatching();
-  }
-
-  UNSAFE_componentWillReceiveProps(nextProps: Props) {
-    if (nextProps.disabled) {
-      this.stopWatching();
-    } else {
-      this.lastValue = null;
-      this.startWatching();
-    }
-  }
-
-  private startWatching() {
-    if (this.interval) {
-      return;
-    }
-    this.interval = setInterval(() => {
-      if (!this.view) {
-        return;
-      }
-      this.view.measure((_x, _y, width, height, _pageX, _pageY) => {
-        this.checkInViewPort(width, height);
+/** Adaptive subscriptions track viewport visibility as a tile scrolls or the app backgrounds. */
+export default function ViewPortDetector({
+  children,
+  disabled,
+  style,
+  onChange,
+}: Props): React.ReactElement {
+  const view = useRef<View>(null);
+  useEffect(() => {
+    if (disabled) return;
+    let mounted = true;
+    let foreground =
+      AppState.currentState !== 'background' &&
+      AppState.currentState !== 'inactive';
+    const measure = () => {
+      if (!foreground) return;
+      view.current?.measureInWindow((x, y, width, height) => {
+        if (!mounted || !foreground) return;
+        const window = Dimensions.get('window');
+        onChange(
+          width > 0 &&
+            height > 0 &&
+            x < window.width &&
+            y < window.height &&
+            x + width > 0 &&
+            y + height > 0
+        );
       });
-    }, this.props.delay || 100);
-  }
-
-  private stopWatching() {
-    this.interval = clearInterval(this.interval);
-  }
-
-  private checkInViewPort(width?: number, height?: number) {
-    let isVisible: boolean;
-    // Not visible if any of these are missing.
-    if (!width || !height) {
-      isVisible = false;
-    } else {
-      isVisible = true;
-    }
-
-    if (this.lastValue !== isVisible) {
-      this.lastValue = isVisible;
-      this.props.onChange?.(isVisible);
-    }
-  }
-
-  render() {
-    return (
-      <View
-        collapsable={false}
-        ref={(component) => {
-          this.view = component;
-        }}
-        {...this.props}
-      >
-        {this.props.children}
-      </View>
-    );
-  }
+    };
+    const updateVisibility = () => {
+      if (foreground) measure();
+      else onChange(false);
+    };
+    const subscription = AppState.addEventListener('change', (state) => {
+      foreground = state === 'active';
+      updateVisibility();
+    });
+    updateVisibility();
+    const interval = setInterval(measure, 1000);
+    return () => {
+      mounted = false;
+      clearInterval(interval);
+      subscription.remove();
+    };
+  }, [disabled, onChange]);
+  return (
+    <View ref={view} collapsable={false} style={style}>
+      {children}
+    </View>
+  );
 }

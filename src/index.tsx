@@ -1,79 +1,60 @@
-import { registerGlobals as webrtcRegisterGlobals } from '@dtelecom/react-native-webrtc';
-import { setupURLPolyfill } from 'react-native-url-polyfill';
-import 'fastestsmallesttextencoderdecoder';
-import AudioSession, {
-  AndroidAudioTypePresets,
-  AndroidAudioTypeOptions,
-} from './audio/AudioSession';
-import type { AudioConfiguration } from './audio/AudioSession';
-import { PixelRatio, Platform } from 'react-native';
+import './textEncoding';
+import { registerGlobals as registerWebRTC } from '@dtelecom/react-native-webrtc';
 import type { LiveKitReactNativeInfo } from '@dtelecom/livekit-client';
+import { PixelRatio, Platform } from 'react-native';
+import { setupURLPolyfill } from 'react-native-url-polyfill';
 
-/**
- * Registers the required globals needed for LiveKit to work.
- *
- * Must be called before using LiveKit.
- */
-export function registerGlobals() {
-  webrtcRegisterGlobals();
-  livekitRegisterGlobals();
+let registered = false;
+
+/** Call once at app startup, before constructing a Room. */
+export function registerGlobals(): void {
+  if (registered) return;
+  registerWebRTC();
   setupURLPolyfill();
-  fixWebrtcAdapter();
-  shimPromiseAllSettled();
-  shimArrayAt();
-  shimAsyncIterator();
-  shimIterator();
-}
-function livekitRegisterGlobals() {
-  let lkGlobal: LiveKitReactNativeInfo = {
+  const platform: LiveKitReactNativeInfo = {
     platform: Platform.OS,
     devicePixelRatio: PixelRatio.get(),
   };
-
-  // @ts-ignore
-  global.DTelecomReactNativeGlobal = lkGlobal;
-}
-
-function fixWebrtcAdapter() {
-  // @ts-ignore
-  if (window?.navigator !== undefined) {
-    // @ts-ignore
-    const { navigator } = window;
-    if (navigator.userAgent === undefined) {
-      navigator.userAgent = navigator.product ?? 'Unknown';
-    }
+  Object.assign(globalThis, { LiveKitReactNativeGlobal: platform });
+  // The room client also reads the browser-style user agent during signaling.
+  const navigator = globalThis.navigator;
+  if (navigator.userAgent === undefined) {
+    Object.assign(navigator, { userAgent: navigator.product ?? 'ReactNative' });
   }
-}
-
-function shimPromiseAllSettled() {
-  var allSettled = require('promise.allsettled');
-  allSettled.shim();
-}
-
-function shimArrayAt() {
-  // Some versions of RN don't have Array.prototype.at, which is used by sdp-transform
-  if (!Array.prototype.at) {
-    var at = require('array.prototype.at');
-    at.shim();
-  }
-}
-
-function shimAsyncIterator() {
-  var shim = require('well-known-symbols/Symbol.asyncIterator/shim');
-  shim();
-}
-
-function shimIterator() {
-  var shim = require('well-known-symbols/Symbol.iterator/shim');
-  shim();
+  registered = true;
 }
 
 export * from './components/VideoView';
 export * from './useParticipant';
 export * from './useRoom';
+export * from './connectRoom';
+export * from './switchCamera';
 export {
-  AudioSession,
+  default as AudioSession,
+  AndroidAudioTypePresets,
+} from './audio/AudioSession';
+export type {
   AudioConfiguration,
   AndroidAudioTypeOptions,
-  AndroidAudioTypePresets,
-};
+  AudioOutput,
+  AudioRoute,
+} from './audio/AudioSession';
+
+export {
+  Room,
+  RoomEvent,
+  ConnectionState,
+  ParticipantEvent,
+  ConnectionQuality,
+  DataPacket_Kind,
+  DisconnectReason,
+  Track,
+  TrackEvent,
+  LocalParticipant,
+  LocalVideoTrack,
+  RemoteVideoTrack,
+  Participant,
+  RemoteParticipant,
+  TrackPublication,
+} from '@dtelecom/livekit-client';
+export type { RoomConnectOptions, VideoTrack } from '@dtelecom/livekit-client';

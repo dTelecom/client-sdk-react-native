@@ -4,56 +4,20 @@ We want this community to be friendly and respectful to each other. Please follo
 
 ## Development workflow
 
-To get started with the project, run `yarn` in the root directory to install the required dependencies for each package:
+Use Node 22 and Yarn Classic 1.22.22 in the SDK checkout. Install the pinned dependencies and check the wrapper before creating its npm tarball.
 
 ```sh
-yarn
-```
-
-> While it's possible to use [`npm`](https://github.com/npm/cli), the tooling is built around [`yarn`](https://classic.yarnpkg.com/), so you'll have an easier time if you use `yarn` for development.
-
-While developing, you can run the [example app](/example/) to test your changes. Any changes you make in your library's JavaScript code will be reflected in the example app without a rebuild. If you change any native code, then you'll need to rebuild the example app.
-
-To start the packager:
-
-```sh
-yarn example start
-```
-
-To run the example app on Android:
-
-```sh
-yarn example android
-```
-
-To run the example app on iOS:
-
-```sh
-yarn example ios
-```
-
-Make sure your code passes TypeScript and ESLint. Run the following to verify:
-
-```sh
+corepack enable
+yarn install --frozen-lockfile
 yarn typescript
 yarn lint
+yarn test --runInBand
+npm pack
 ```
 
-To fix formatting errors, run the following:
+The example is a separate React Native application. Install the local wrapper tarball in the example to exercise the same package layout and native autolinking as a consumer. Repack and reinstall after changing the SDK. When testing an unpublished room client, include its tarball in the same install. See the [example instructions](example/README.md).
 
-```sh
-yarn lint --fix
-```
-
-Remember to add tests for your change if possible. Run the unit tests by:
-
-```sh
-yarn test
-```
-
-To edit the Objective-C files, open `example/ios/Dmeet.xcworkspace` in XCode and find the source files at `Pods > Development Pods > dtelecom-react-native`.
-
-To edit the Kotlin files, open `example/android` in Android studio and find the source files at `livekitreactnative` under `Android`.
+Open `example/ios/DtelecomRooms.xcworkspace` after CocoaPods installation to inspect the Apple build. Open `example/android` in Android Studio for the Android build.
 
 ### Commit message convention
 

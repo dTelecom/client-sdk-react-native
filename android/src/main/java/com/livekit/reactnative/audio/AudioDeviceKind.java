@@ -21,7 +21,7 @@ public enum AudioDeviceKind {
     @Nullable
     public static AudioDeviceKind fromAudioDevice(AudioDevice audioDevice) {
         for (AudioDeviceKind kind : values()) {
-            if (kind.audioDeviceClass.equals(audioDevice.getClass())) {
+            if (kind.audioDeviceClass.isInstance(audioDevice)) {
                 return kind;
             }
         }

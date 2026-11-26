@@ -1,120 +1,103 @@
-#import <React/RCTBridgeModule.h>
 #import "DtelecomReactNative.h"
-#import "WebRTCModule.h"
-#import "WebRTCModuleOptions.h"
-#import <WebRTC/RTCAudioSession.h>
-#import <WebRTC/RTCAudioSessionConfiguration.h>
-#import <AVFAudio/AVFAudio.h>
+#import <AVFoundation/AVFoundation.h>
 #import <AVKit/AVKit.h>
+#import <React/RCTBridgeModule.h>
+#import <LiveKitWebRTC/LiveKitWebRTC.h>
+#import <LKRNWebRTCModuleOptions.h>
+
+static NSString *const RouteChangeEvent = @"dTelecomAudioRouteChanged";
 
 @implementation DtelecomReactNative
+
 RCT_EXPORT_MODULE();
 
--(instancetype)init {
-    if(self = [super init]) {
-
-        RTCAudioSessionConfiguration* config = [[RTCAudioSessionConfiguration alloc] init];
-        [config setCategory:AVAudioSessionCategoryPlayAndRecord];
-        [config setCategoryOptions:
-             AVAudioSessionCategoryOptionAllowAirPlay|
-             AVAudioSessionCategoryOptionAllowBluetooth|
-             AVAudioSessionCategoryOptionAllowBluetoothA2DP|
-             AVAudioSessionCategoryOptionDefaultToSpeaker
-        ];
-        [config setMode:AVAudioSessionModeVideoChat];
-        [RTCAudioSessionConfiguration setWebRTCConfiguration: config];
-        return self;
-    } else {
-        return nil;
-    }
-}
-
-+(BOOL)requiresMainQueueSetup {
++ (BOOL)requiresMainQueueSetup {
     return NO;
 }
 
-+(void)setup {
-    RTCDefaultVideoEncoderFactory *videoEncoderFactory = [[RTCDefaultVideoEncoderFactory alloc] init];
-    RTCVideoEncoderFactorySimulcast *simulcastVideoEncoderFactory = [[RTCVideoEncoderFactorySimulcast alloc] initWithPrimary:videoEncoderFactory fallback:videoEncoderFactory];
-    WebRTCModuleOptions *options = [WebRTCModuleOptions sharedInstance];
-    options.videoEncoderFactory = simulcastVideoEncoderFactory;
+- (dispatch_queue_t)methodQueue {
+    return dispatch_get_main_queue();
 }
 
-/// Configure default audio config for WebRTC
-RCT_EXPORT_METHOD(configureAudio:(NSDictionary *) config){
-    NSDictionary *iOSConfig = [config objectForKey:@"ios"];
-    if(iOSConfig == nil) {
+// Existing native consumers may opt in to layered video encoding before RN starts.
++ (void)setup {
+    LKRTCDefaultVideoEncoderFactory *factory = [[LKRTCDefaultVideoEncoderFactory alloc] init];
+    [LKRNWebRTCModuleOptions sharedInstance].videoEncoderFactory =
+        [[LKRTCVideoEncoderFactorySimulcast alloc] initWithPrimary:factory fallback:factory];
+}
+
+- (NSArray<NSString *> *)supportedEvents {
+    return @[RouteChangeEvent];
+}
+
+- (void)startObserving {
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(routeChanged:)
+                                                 name:AVAudioSessionRouteChangeNotification object:nil];
+}
+
+- (void)stopObserving {
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:AVAudioSessionRouteChangeNotification object:nil];
+}
+
+static NSString *outputKind(AVAudioSessionPort port) {
+    if ([port isEqualToString:AVAudioSessionPortBuiltInReceiver]) return @"earpiece";
+    if ([port isEqualToString:AVAudioSessionPortBuiltInSpeaker]) return @"speaker";
+    if ([port isEqualToString:AVAudioSessionPortHeadphones] || [port isEqualToString:AVAudioSessionPortHeadsetMic] ||
+        [port isEqualToString:AVAudioSessionPortLineOut] || [port isEqualToString:AVAudioSessionPortUSBAudio]) return @"headset";
+    if ([port isEqualToString:AVAudioSessionPortBluetoothA2DP] || [port isEqualToString:AVAudioSessionPortBluetoothHFP] ||
+        [port isEqualToString:AVAudioSessionPortBluetoothLE]) return @"bluetooth";
+    return @"other";
+}
+
+- (NSDictionary *)currentRoute {
+    AVAudioSession *session = [AVAudioSession sharedInstance];
+    NSMutableOrderedSet *available = [NSMutableOrderedSet orderedSetWithObject:@"speaker"];
+    if (UIDevice.currentDevice.userInterfaceIdiom == UIUserInterfaceIdiomPhone) [available addObject:@"earpiece"];
+    for (AVAudioSessionPortDescription *input in session.availableInputs) {
+        if (![input.portType isEqualToString:AVAudioSessionPortBuiltInMic]) [available addObject:outputKind(input.portType)];
+    }
+    for (AVAudioSessionPortDescription *output in session.currentRoute.outputs) {
+        [available addObject:outputKind(output.portType)];
+    }
+    AVAudioSessionPortDescription *output = session.currentRoute.outputs.firstObject;
+    return @{@"availableOutputs": available.array, @"selectedOutput": output ? outputKind(output.portType) : @"unknown"};
+}
+
+- (void)routeChanged:(NSNotification *)notification {
+    [self sendEventWithName:RouteChangeEvent body:[self currentRoute]];
+}
+
+RCT_REMAP_METHOD(getAudioRoute, getAudioRouteWithResolver:(RCTPromiseResolveBlock)resolve
+                                               rejecter:(RCTPromiseRejectBlock)reject) {
+    resolve([self currentRoute]);
+}
+
+RCT_EXPORT_METHOD(selectAudioOutput:(NSString *)deviceId
+                       withResolver:(RCTPromiseResolveBlock)resolve
+                       withRejecter:(RCTPromiseRejectBlock)reject) {
+    BOOL speaker = [deviceId isEqualToString:@"force_speaker"];
+    if (!speaker && ![deviceId isEqualToString:@"default"]) {
+        resolve(@NO);
         return;
     }
-
-    NSString * defaultOutput = [iOSConfig objectForKey:@"defaultOutput"];
-    if (defaultOutput == nil) {
-        defaultOutput = @"speaker";
-    }
-
-    RTCAudioSessionConfiguration* rtcConfig = [[RTCAudioSessionConfiguration alloc] init];
-    [rtcConfig setCategory:AVAudioSessionCategoryPlayAndRecord];
-
-    if([defaultOutput isEqualToString:@"earpiece"]){
-        [rtcConfig setCategoryOptions:
-         AVAudioSessionCategoryOptionAllowAirPlay|
-         AVAudioSessionCategoryOptionAllowBluetooth|
-         AVAudioSessionCategoryOptionAllowBluetoothA2DP];
-        [rtcConfig setMode:AVAudioSessionModeVoiceChat];
-    } else {
-        [rtcConfig setCategoryOptions:
-         AVAudioSessionCategoryOptionAllowAirPlay|
-         AVAudioSessionCategoryOptionAllowBluetooth|
-         AVAudioSessionCategoryOptionAllowBluetoothA2DP|
-         AVAudioSessionCategoryOptionDefaultToSpeaker];
-        [rtcConfig setMode:AVAudioSessionModeVideoChat];
-    }
-    [RTCAudioSessionConfiguration setWebRTCConfiguration: rtcConfig];
+    LKRTCAudioSession *session = [LKRTCAudioSession sharedInstance];
+    [session lockForConfiguration];
+    NSError *error = nil;
+    BOOL success = [session overrideOutputAudioPort:speaker ? AVAudioSessionPortOverrideSpeaker : AVAudioSessionPortOverrideNone
+                                             error:&error];
+    [session unlockForConfiguration];
+    if (error) reject(@"audio_route", error.localizedDescription, error);
+    else resolve(@(success));
 }
 
-RCT_EXPORT_METHOD(startAudioSession){
-}
-
-RCT_EXPORT_METHOD(stopAudioSession){
-
-}
-
-RCT_EXPORT_METHOD(showAudioRoutePicker){
-    if (@available(iOS 11.0, *)) {
-        AVRoutePickerView *routePickerView = [[AVRoutePickerView alloc] init];
-        NSArray<UIView *> *subviews = routePickerView.subviews;
-        for (int i = 0; i < subviews.count; i++) {
-            UIView *subview = [subviews objectAtIndex:i];
-            if([subview isKindOfClass:[UIButton class]]) {
-                UIButton *button = (UIButton *) subview;
-                [button sendActionsForControlEvents:UIControlEventTouchUpInside];
-                break;
-            }
+RCT_EXPORT_METHOD(showAudioRoutePicker) {
+    AVRoutePickerView *picker = [[AVRoutePickerView alloc] init];
+    for (UIView *view in picker.subviews) {
+        if ([view isKindOfClass:[UIButton class]]) {
+            [(UIButton *)view sendActionsForControlEvents:UIControlEventTouchUpInside];
+            break;
         }
     }
 }
 
-RCT_EXPORT_METHOD(getAudioOutputsWithResolver:(RCTPromiseResolveBlock)resolve
-                  withRejecter:(RCTPromiseRejectBlock)reject){
-    resolve(@[@"default", @"force_speaker"]);
-}
-RCT_EXPORT_METHOD(selectAudioOutput:(NSString *)deviceId
-                  withResolver:(RCTPromiseResolveBlock)resolve
-                  withRejecter:(RCTPromiseRejectBlock)reject){
-
-    AVAudioSession *session = [AVAudioSession sharedInstance];
-    NSError *error = nil;
-
-    if ([deviceId isEqualToString:@"default"]) {
-        [session overrideOutputAudioPort:AVAudioSessionPortOverrideNone error:&error];
-    } else if ([deviceId isEqualToString:@"force_speaker"]) {
-        [session overrideOutputAudioPort:AVAudioSessionPortOverrideSpeaker error:&error];
-    }
-
-    if (error != nil) {
-        reject(@"selectAudioOutput error", error.localizedDescription, error);
-    } else {
-        resolve(nil);
-    }
-}
 @end

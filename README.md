@@ -1,263 +1,68 @@
-# dTelecom React Native SDK 1.x (legacy)
+# dTelecom React Native SDK
 
-<!--BEGIN_DESCRIPTION-->`@dtelecom/react-native@1.3.0` and its `@dtelecom/react-native-webrtc` 104.x dependency are legacy releases for existing integrations. They are unsupported for new dTelecom Cloud apps.<!--END_DESCRIPTION-->
+The dTelecom React Native SDK 2.0 for iOS and Android connects to dTelecom rooms, publishes camera and microphone tracks, renders remote video and exchanges room data. It uses the same room client as dTelecom web apps. The [example app](example/README.md) accepts dTelecom Meet and Live invites.
 
-For new apps that can use a browser, follow the [web quickstart](https://docs.dtelecom.org/quickstart/). Check the [SDK catalog](https://docs.dtelecom.org/reference/sdks/) for public React Native availability.
+## Install
 
-## Installation for existing 1.3.0 apps
-
-### NPM
+Use React Native 0.86, React 19.2.3 and Node 22.13 or later within Node 22. The SDK supports iOS 15.1 or later and Android API 24 or later. npm resolves its pinned room client (1.12.28) and WebRTC bridge (150.2.0-preview.0) automatically.
 
 ```sh
-npm install @dtelecom/react-native@1.3.0 @dtelecom/react-native-webrtc@104.0.2
+npm install @dtelecom/react-native@2.0.0
 ```
 
-### Yarn
+To test a local wrapper build, use its tarball path in the install command. npm downloads both peers from the registry.
 
 ```sh
-yarn add @dtelecom/react-native@1.3.0 @dtelecom/react-native-webrtc@104.0.2
+npm install --no-save /absolute/path/to/dtelecom-react-native-2.0.0.tgz
 ```
 
-This library depends on `@dtelecom/react-native-webrtc`, which has additional installation instructions found here:
+On iOS, include both sources in your Podfile and run `bundle exec pod install` from the iOS directory. The first source supplies the pinned WebRTC binary. Add camera and microphone usage descriptions if the app offers capture.
 
-- [iOS Installation Guide for 104.x](https://github.com/dTelecom/react-native-webrtc/blob/v104.0/Documentation/iOSInstallation.md)
-- [Android Installation Guide for 104.x](https://github.com/dTelecom/react-native-webrtc/blob/v104.0/Documentation/AndroidInstallation.md)
-
----
-
-Once the `@dtelecom/react-native-webrtc` dependency is installed, one last step is needed to finish the installation:
-
-### Android
-
-In `MainApplication.java`, use the class name shipped in the 1.3.0 npm package.
-
+```ruby
+source 'https://github.com/livekit/podspecs.git'
+source 'https://cdn.cocoapods.org/'
 ```
-import com.livekit.reactnative.LiveKitReactNative;
-import com.livekit.reactnative.audio.AudioType;
 
-public class MainApplication extends Application implements ReactApplication {
+On Android, initialize the bridge from `MainApplication.onCreate()` before React Native loads. Request microphone or camera permission when the participant chooses to publish. On Android 12 or later, request Bluetooth connect permission when offering Bluetooth routing.
 
-  @Override
-  public void onCreate() {
-    // Place this above any other RN related initialization
-    // When AudioType is omitted, it'll default to CommunicationAudioType
-    // use MediaAudioType if user is only consuming audio, and not publishing
-    LiveKitReactNative.setup(this, new AudioType.CommunicationAudioType());
+```kotlin
+import com.livekit.reactnative.DTelecomReactNative
 
-    //...
-  }
+override fun onCreate() {
+    super.onCreate()
+    DTelecomReactNative.setup(this)
+    loadReactNative(this)
 }
 ```
 
-### iOS
+## Join a room
 
-In your app delegate, use the Objective-C header shipped in the 1.3.0 npm package.
+Call `registerGlobals()` in the application entry point before creating a room. Your backend obtains the participant token and returns its signaling URL and optional ranked alternatives. Keep Cloud credentials on the backend. Pass the issuer's complete list to `connectRoom` so a reachable alternate can accept the same token.
 
-```
-#import "LivekitReactNative.h"
-
-@implementation AppDelegate
-
-- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
-{
-  // Place this above any other RN related initialization
-  [LivekitReactNative setup];
-
-  //...
-}
-```
-
-## Example app
-
-The [example app](example/) uses the historical dMeet authentication flow. For a new Cloud integration, your backend issues the participant token and returns its matching node URL. [Connection guide](https://docs.dtelecom.org/rooms/connect/)
-
-## Usage
-
-In your `index.js` file, setup the dTelecom SDK by calling `registerGlobals()`.
-This sets up the required WebRTC libraries for use in Javascript, and is needed for LiveKit to work.
-
-```js
-import { registerGlobals } from '@dtelecom/react-native';
-
-// ...
+```tsx
+import { AudioSession, connectRoom, registerGlobals, Room } from '@dtelecom/react-native';
+import type { RoomCredentials } from '@dtelecom/react-native';
 
 registerGlobals();
-```
 
-A Room object can then be created and connected to.
-
-```js
-import { Participant, Room, Track } from '@dtelecom/livekit-client';
-import { useRoom, AudioSession, VideoView } from '@dtelecom/react-native';
-
-/*...*/
-
-// Create a room state
-const [room] = useState(() => new Room());
-
-// Get the participants from the room
-const { participants } = useRoom(room);
-
-useEffect(() => {
-  let connect = async () => {
-    await AudioSession.startAudioSession();
-    await room.connect(url, token, {});
-    console.log('connected to ', url, ' ', token);
-  };
-  connect();
-  return () => {
-    room.disconnect();
-    AudioSession.stopAudioSession();
-  };
-}, [url, token, room]);
-
-const videoView = participants.length > 0 && (
-  <VideoView
-    style={{ flex: 1, width: '100%' }}
-    videoTrack={participants[0].getTrack(Track.Source.Camera)?.videoTrack}
-  />
-);
-```
-
-[API documentation is located here.](https://htmlpreview.github.io/?https://raw.githubusercontent.com/dtelecom/client-sdk-react-native/main/docs/modules.html)
-
-Additional documentation for the dTelecom SDK can be found at https://docs.dtelecom.org/
-
-## Audio sessions
-
-As seen in the above example, we've introduced a new class `AudioSession` that helps
-to manage the audio session on native platforms. This class wraps either [AudioManager](https://developer.android.com/reference/android/media/AudioManager) on Android, or [AVAudioSession](https://developer.apple.com/documentation/avfaudio/avaudiosession) on iOS.
-
-You can customize the configuration of the audio session with `configureAudio`.
-
-### Media playback
-
-By default, the audio session is set up for bidirectional communication. In this mode, the audio framework exhibits the following behaviors:
-
-- The volume cannot be reduced to 0.
-- Echo cancellation is available and is enabled by default.
-- A microphone indicator can be displayed, depending on the platform.
-
-If you're leveraging dTelecom primarily for media playback, you have the option to reconfigure the audio session to better suit media playback. Here's how:
-
-Note: iOS audio session customization is in development, and will be documented here when released.
-
-```js
-useEffect(() => {
-  let connect = async () => {
-    // configure audio session prior to starting it.
-    await AudioSession.configureAudio({
-      android: {
-        // currently supports .media and .communication presets
-        audioTypeOptions: AndroidAudioTypePresets.media,
-      },
-    });
-    await AudioSession.startAudioSession();
-    await room.connect(url, token, {});
-  };
-  connect();
-  return () => {
-    room.disconnect();
-    AudioSession.stopAudioSession();
-  };
-}, [url, token, room]);
-```
-
-### Customizing audio session
-
-Instead of using our presets, you can further customize the audio session to suit your specific needs.
-
-```js
-await AudioSession.configureAudio({
-  android: {
-    preferredOutputList: ['earpiece'],
-    // See [AudioManager](https://developer.android.com/reference/android/media/AudioManager)
-    // for details on audio and focus modes.
-    audioTypeOptions: {
-      manageAudioFocus: true,
-      audioMode: 'normal',
-      audioFocusMode: 'gain',
-      audioStreamType: 'music',
-      audioAttributesUsageType: 'media',
-      audioAttributesContentType: 'unknown',
-    },
-  },
-});
-await AudioSession.startAudioSession();
-```
-
-## Screenshare
-
-Enabling screenshare requires extra installation steps:
-
-### Android
-
-Android screenshare requires a foreground service with type `mediaProjection` to be present.
-
-The example app uses [@voximplant/react-native-foreground-service](https://github.com/voximplant/react-native-foreground-service) for this.
-Ensure that the service is labelled a `mediaProjection` service like so:
-
-```
-<service android:name="com.voximplant.foregroundservice.VIForegroundService"
-  android:foregroundServiceType="mediaProjection" />
-```
-
-Once setup, start the foreground service prior to using screenshare.
-
-### iOS
-
-iOS screenshare requires adding a Broadcast Extension to your iOS project. Follow the integration instructions here:
-
-https://jitsi.github.io/handbook/docs/dev-guide/dev-guide-ios-sdk/#screen-sharing-integration
-
-It involves copying the files found in this [sample project](https://github.com/jitsi/jitsi-meet-sdk-samples/tree/18c35f7625b38233579ff34f761f4c126ba7e03a/ios/swift-screensharing/JitsiSDKScreenSharingTest/Broadcast%20Extension)
-to your iOS project, and registering a Broadcast Extension in Xcode.
-
-It's also recommended to use [CallKeep](https://github.com/react-native-webrtc/react-native-callkeep),
-to register a call with CallKit (as well as turning on the `voip` background mode).
-Due to background app processing limitations, screen recording may be interrupted if the app is restricted
-in the background. Registering with CallKit allows the app to continue processing for the duration of the call.
-
-Once setup, iOS screenshare can be initiated like so:
-
-```js
-const screenCaptureRef = React.useRef(null);
-const screenCapturePickerView = Platform.OS === 'ios' && (
-  <ScreenCapturePickerView ref={screenCaptureRef} />
-);
-const startBroadcast = async () => {
-  if (Platform.OS === 'ios') {
-    const reactTag = findNodeHandle(screenCaptureRef.current);
-    await NativeModules.ScreenCapturePickerViewManager.show(reactTag);
-    room.localParticipant.setScreenShareEnabled(true);
-  } else {
-    room.localParticipant.setScreenShareEnabled(true);
+export async function joinRoom(credentials: RoomCredentials) {
+  const room = new Room();
+  await AudioSession.startAudioSession();
+  try {
+    await connectRoom(room, credentials);
+    return room;
+  } catch (error) {
+    await room.disconnect();
+    await AudioSession.stopAudioSession();
+    throw error;
   }
-};
-
-return (
-  <View style={styles.container}>
-    /*...*/ // Make sure the ScreenCapturePickerView exists in the view tree.
-    {screenCapturePickerView}
-  </View>
-);
+}
 ```
 
-### Note
+Joining leaves capture under the app's control. After the participant grants permission, call `room.localParticipant.setMicrophoneEnabled(true)` or `setCameraEnabled(true)`. Pass a subscribed video track to `<VideoView videoTrack={track} />`. On Android, `useTextureView` supports overlapping or clipped tiles. On leave, disconnect the room and stop the audio session.
 
-You will not be able to publish camera or microphone tracks on iOS Simulator.
-
-## Troubleshooting
-
-#### Cannot read properties of undefined (reading 'split')
-
-This error could happen if you are using yarn and have incompatible versions of dependencies with dtelecom-client.
-
-To fix this, you can either:
-
-- use another package manager, like npm
-- use [yarn-deduplicate](https://www.npmjs.com/package/yarn-deduplicate) to deduplicate dependencies
+The example includes the invite exchange, publish controls, viewer playback, chat and audio routing. The 1.x SDK and its 104.x bridge are legacy releases. [Example app](example/README.md) · [SDK catalog](https://docs.dtelecom.org/reference/sdks/)
 
 ## License
 
-Apache License 2.0
+Apache License 2.0. [License](LICENSE) · [Third-party notices](NOTICE)

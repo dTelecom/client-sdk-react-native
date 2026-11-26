@@ -10,13 +10,13 @@ Pod::Spec.new do |s|
   s.license      = package["license"]
   s.authors      = package["author"]
 
-  s.platforms    = { :ios => "10.0" }
+  s.platforms    = { :ios => "15.1" }
   s.source       = { :git => "https://github.com/dtelecom/client-sdk-react-native.git", :tag => "#{s.version}" }
 
   s.source_files = "ios/**/*.{h,m,mm}"
 
-  s.framework    = 'AVFAudio'
+  s.frameworks   = 'AVFoundation', 'AVKit'
 
   s.dependency "React-Core"
-  s.dependency "dtelecom-react-native-webrtc"
+  s.dependency "dtelecom-react-native-webrtc", "150.2.0-preview.0"
 end

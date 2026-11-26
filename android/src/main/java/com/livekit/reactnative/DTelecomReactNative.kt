@@ -1,13 +1,13 @@
 package com.livekit.reactnative
 
-import android.app.Application
 import android.content.Context
 import android.os.Build
 import com.livekit.reactnative.audio.AudioType
-import com.livekit.reactnative.video.SimulcastVideoEncoderFactoryWrapper
-import com.livekit.reactnative.video.WrappedVideoDecoderFactoryProxy
-import com.oney.WebRTCModule.WebRTCModuleOptions
-import org.webrtc.audio.JavaAudioDeviceModule
+import io.livekit.reactnative.webrtc.EglUtils
+import io.livekit.reactnative.webrtc.WebRTCModuleOptions
+import io.livekit.reactnative.webrtc.webrtcutils.H264AndSoftwareVideoEncoderFactory
+import livekit.org.webrtc.SimulcastVideoEncoderFactory
+import livekit.org.webrtc.audio.JavaAudioDeviceModule
 
 object DTelecomReactNative {
 
@@ -21,8 +21,8 @@ object DTelecomReactNative {
     @JvmOverloads
     fun setup(context: Context, audioType: AudioType = AudioType.CommunicationAudioType()) {
         val options = WebRTCModuleOptions.getInstance()
-        options.videoEncoderFactory = SimulcastVideoEncoderFactoryWrapper(null, true, true)
-        options.videoDecoderFactory = WrappedVideoDecoderFactoryProxy()
+        val codecs = H264AndSoftwareVideoEncoderFactory(EglUtils.getRootEglBaseContext())
+        options.videoEncoderFactory = SimulcastVideoEncoderFactory(codecs, codecs)
 
         val useHardwareAudioProcessing = Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
 

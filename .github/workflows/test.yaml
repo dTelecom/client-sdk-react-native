@@ -1,46 +1,21 @@
-name: Test
+name: SDK checks
 on:
   push:
-    branches: [ main ]
-    paths-ignore:
-      - '**.md'
+    branches: [main, dtelecom-m150]
   pull_request:
-    branches: [ main ]
-    paths-ignore:
-      - '**.md'
 
 jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-
-    - uses: actions/setup-node@v2
-      with:
-        node-version: '16.x'
-
-    - uses: actions/cache@v2
-      with:
-        path: |
-          ~/.npm
-          ~/.config/yarn/global
-        key: ${{ runner.os }}-node-${{ hashFiles('**/yarn.lock') }}
-        restore-keys: |
-          ${{ runner.os }}-node-
-
-    - name: Install Yarn
-      run: |
-        npm install -g yarn
-        yarn
-
-    - name: Typescript
-      run: yarn typescript
-
-    - name: ESLint
-      run: yarn lint
-
-    - name: Run Tests
-      run: yarn test
-
-    - name: Validate docs
-      run: yarn build-docs --treatWarningsAsErrors
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+          cache: yarn
+      - run: corepack enable
+      - run: yarn install --frozen-lockfile
+      - run: yarn typescript
+      - run: yarn lint
+      - run: yarn test --runInBand
+      - run: yarn prepare

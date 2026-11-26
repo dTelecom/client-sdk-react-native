@@ -3,15 +3,14 @@ import {
   ConnectionState,
   LocalParticipant,
   Participant,
-  RemoteTrack,
   Room,
   RoomEvent,
-  Track,
 } from '@dtelecom/livekit-client';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 export interface RoomState {
-  room?: Room;
+  room: Room;
+  state: ConnectionState;
   /* all participants in the room, including the local participant. */
   participants: Participant[];
   /* all subscribed audio tracks in the room, not including local participant. */
@@ -24,80 +23,45 @@ export interface RoomOptions {
 }
 
 export function useRoom(room: Room, options?: RoomOptions): RoomState {
-  const [error] = useState<Error>();
-  const [participants, setParticipants] = useState<Participant[]>([]);
-  const [audioTracks, setAudioTracks] = useState<AudioTrack[]>([]);
-
-  const sortFunc = options?.sortParticipants ?? sortParticipants;
+  const sort = options?.sortParticipants ?? sortParticipants;
+  const readState = useCallback(() => {
+    const participants: Participant[] = [
+      room.localParticipant,
+      ...room.participants.values(),
+    ];
+    sort(participants, room.localParticipant);
+    const audioTracks: AudioTrack[] = [];
+    room.participants.forEach((participant) => {
+      participant.audioTracks.forEach((publication) => {
+        if (publication.audioTrack) audioTracks.push(publication.audioTrack);
+      });
+    });
+    return { room, participants, audioTracks, state: room.state };
+  }, [room, sort]);
+  const [state, setState] = useState(readState);
 
   useEffect(() => {
-    const onParticipantsChanged = () => {
-      const remotes = Array.from(room.participants.values());
-      const newParticipants: Participant[] = [room.localParticipant];
-      newParticipants.push(...remotes);
-      sortFunc(newParticipants, room.localParticipant);
-      setParticipants(newParticipants);
-    };
-    const onSubscribedTrackChanged = (track?: RemoteTrack) => {
-      // ordering may have changed, re-sort
-      onParticipantsChanged();
-      if (track && track.kind !== Track.Kind.Audio) {
-        return;
-      }
-      const tracks: AudioTrack[] = [];
-      room.participants.forEach((p) => {
-        p.audioTracks.forEach((pub) => {
-          if (pub.audioTrack) {
-            tracks.push(pub.audioTrack);
-          }
-        });
-      });
-      setAudioTracks(tracks);
-    };
-
-    const onConnectionStateChanged = (state: ConnectionState) => {
-      if (state === ConnectionState.Connected) {
-        onParticipantsChanged();
-      }
-    };
-
-    room.once(RoomEvent.Disconnected, () => {
-      room
-        .off(RoomEvent.ParticipantConnected, onParticipantsChanged)
-        .off(RoomEvent.ParticipantDisconnected, onParticipantsChanged)
-        .off(RoomEvent.ActiveSpeakersChanged, onParticipantsChanged)
-        .off(RoomEvent.TrackSubscribed, onSubscribedTrackChanged)
-        .off(RoomEvent.TrackUnsubscribed, onSubscribedTrackChanged)
-        .off(RoomEvent.LocalTrackPublished, onParticipantsChanged)
-        .off(RoomEvent.LocalTrackUnpublished, onParticipantsChanged)
-        .off(RoomEvent.AudioPlaybackStatusChanged, onParticipantsChanged)
-        .off(RoomEvent.ConnectionStateChanged, onConnectionStateChanged);
-    });
-    room
-      .on(RoomEvent.ConnectionStateChanged, onConnectionStateChanged)
-      .on(RoomEvent.Reconnected, onParticipantsChanged)
-      .on(RoomEvent.ParticipantConnected, onParticipantsChanged)
-      .on(RoomEvent.ParticipantDisconnected, onParticipantsChanged)
-      .on(RoomEvent.ActiveSpeakersChanged, onParticipantsChanged)
-      .on(RoomEvent.TrackSubscribed, onSubscribedTrackChanged)
-      .on(RoomEvent.TrackUnsubscribed, onSubscribedTrackChanged)
-      .on(RoomEvent.LocalTrackPublished, onParticipantsChanged)
-      .on(RoomEvent.LocalTrackUnpublished, onParticipantsChanged)
-      // trigger a state change by re-sorting participants
-      .on(RoomEvent.AudioPlaybackStatusChanged, onParticipantsChanged);
-
-    onSubscribedTrackChanged();
-
+    const update = () => setState(readState());
+    const events = [
+      RoomEvent.ConnectionStateChanged,
+      RoomEvent.Reconnected,
+      RoomEvent.Disconnected,
+      RoomEvent.ParticipantConnected,
+      RoomEvent.ParticipantDisconnected,
+      RoomEvent.ActiveSpeakersChanged,
+      RoomEvent.TrackSubscribed,
+      RoomEvent.TrackUnsubscribed,
+      RoomEvent.LocalTrackPublished,
+      RoomEvent.LocalTrackUnpublished,
+      RoomEvent.AudioPlaybackStatusChanged,
+    ] as const;
+    events.forEach((event) => room.on(event, update));
+    update();
     return () => {
-      room.disconnect();
+      events.forEach((event) => room.off(event, update));
     };
-  }, [room, sortFunc]);
-
-  return {
-    error,
-    participants,
-    audioTracks,
-  };
+  }, [room, readState]);
+  return state;
 }
 
 /**

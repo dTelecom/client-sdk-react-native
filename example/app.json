@@ -1,7 +1,4 @@
 {
-  "name": "Dmeet",
-  "displayName": "Dmeet",
-  "expo": {
-    "scheme": "dmeet"
-  }
+  "name": "DtelecomRooms",
+  "displayName": "dTelecom Rooms"
 }

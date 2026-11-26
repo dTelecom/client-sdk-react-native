@@ -6,7 +6,7 @@ import {
   Track,
   TrackPublication,
 } from '@dtelecom/livekit-client';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 export interface ParticipantState {
   isSpeaking: boolean;
@@ -21,124 +21,43 @@ export interface ParticipantState {
 }
 
 export function useParticipant(participant: Participant): ParticipantState {
-  const [isAudioMuted, setAudioMuted] = useState(false);
-  const [, setVideoMuted] = useState(false);
-  const [connectionQuality, setConnectionQuality] = useState<ConnectionQuality>(
-    participant.connectionQuality
-  );
-  const [isSpeaking, setSpeaking] = useState(false);
-  const [metadata, setMetadata] = useState<string>();
-  const [publications, setPublications] = useState<TrackPublication[]>([]);
-  const [subscribedTracks, setSubscribedTracks] = useState<TrackPublication[]>(
-    []
-  );
-
-  const [cameraPublication, setCameraPublication] = useState(
-    participant.getTrack(Track.Source.Camera)
-  );
-  const [microphonePublication, setMicrophonePublication] = useState(
-    participant.getTrack(Track.Source.Microphone)
-  );
-  const [screenSharePublication, setScreenSharePublication] = useState(
-    participant.getTrack(Track.Source.ScreenShare)
-  );
-  useEffect(() => {
-    const onPublicationsChanged = () => {
-      setPublications(Array.from(participant.tracks.values()));
-      setCameraPublication(participant.getTrack(Track.Source.Camera));
-      setMicrophonePublication(participant.getTrack(Track.Source.Microphone));
-      setScreenSharePublication(participant.getTrack(Track.Source.ScreenShare));
-      setSubscribedTracks(
-        Array.from(participant.tracks.values()).filter((pub) => {
-          return pub.isSubscribed && pub.track !== undefined;
-        })
-      );
-    };
-    const onMuted = (pub: TrackPublication) => {
-      if (pub.kind === Track.Kind.Audio) {
-        setAudioMuted(true);
-      } else if (pub.kind === Track.Kind.Video) {
-        setVideoMuted(true);
-      }
-    };
-    const onUnmuted = (pub: TrackPublication) => {
-      if (pub.kind === Track.Kind.Audio) {
-        setAudioMuted(false);
-      } else if (pub.kind === Track.Kind.Video) {
-        setVideoMuted(false);
-      }
-    };
-    const onMetadataChanged = () => {
-      if (participant.metadata) {
-        setMetadata(participant.metadata);
-      }
-    };
-    const onIsSpeakingChanged = () => {
-      setSpeaking(participant.isSpeaking);
-    };
-    const onConnectionQualityUpdate = () => {
-      setConnectionQuality(participant.connectionQuality);
-    };
-
-    // register listeners
-    participant
-      .on(ParticipantEvent.TrackMuted, onMuted)
-      .on(ParticipantEvent.TrackUnmuted, onUnmuted)
-      .on(ParticipantEvent.ParticipantMetadataChanged, onMetadataChanged)
-      .on(ParticipantEvent.IsSpeakingChanged, onIsSpeakingChanged)
-      .on(ParticipantEvent.TrackPublished, onPublicationsChanged)
-      .on(ParticipantEvent.TrackUnpublished, onPublicationsChanged)
-      .on(ParticipantEvent.TrackSubscribed, onPublicationsChanged)
-      .on(ParticipantEvent.TrackUnsubscribed, onPublicationsChanged)
-      .on(ParticipantEvent.LocalTrackPublished, onPublicationsChanged)
-      .on(ParticipantEvent.LocalTrackUnpublished, onPublicationsChanged)
-      .on(ParticipantEvent.ConnectionQualityChanged, onConnectionQualityUpdate);
-
-    // set initial state
-    onMetadataChanged();
-    onIsSpeakingChanged();
-    onPublicationsChanged();
-
-    return () => {
-      // cleanup
-      participant
-        .off(ParticipantEvent.TrackMuted, onMuted)
-        .off(ParticipantEvent.TrackUnmuted, onUnmuted)
-        .off(ParticipantEvent.ParticipantMetadataChanged, onMetadataChanged)
-        .off(ParticipantEvent.IsSpeakingChanged, onIsSpeakingChanged)
-        .off(ParticipantEvent.TrackPublished, onPublicationsChanged)
-        .off(ParticipantEvent.TrackUnpublished, onPublicationsChanged)
-        .off(ParticipantEvent.TrackSubscribed, onPublicationsChanged)
-        .off(ParticipantEvent.TrackUnsubscribed, onPublicationsChanged)
-        .off(ParticipantEvent.LocalTrackPublished, onPublicationsChanged)
-        .off(ParticipantEvent.LocalTrackUnpublished, onPublicationsChanged)
-        .off(
-          ParticipantEvent.ConnectionQualityChanged,
-          onConnectionQualityUpdate
-        );
+  const readState = useCallback((): ParticipantState => {
+    const publications = Array.from(participant.tracks.values());
+    return {
+      isLocal: participant instanceof LocalParticipant,
+      isSpeaking: participant.isSpeaking,
+      connectionQuality: participant.connectionQuality,
+      metadata: participant.metadata,
+      publications,
+      subscribedTracks: publications.filter(
+        (p) => p.isSubscribed && p.track !== undefined
+      ),
+      cameraPublication: participant.getTrack(Track.Source.Camera),
+      microphonePublication: participant.getTrack(Track.Source.Microphone),
+      screenSharePublication: participant.getTrack(Track.Source.ScreenShare),
     };
   }, [participant]);
-
-  let muted: boolean | undefined;
-  participant.audioTracks.forEach((pub) => {
-    muted = pub.isMuted;
-  });
-  if (muted === undefined) {
-    muted = true;
-  }
-  if (isAudioMuted !== muted) {
-    setAudioMuted(muted);
-  }
-
-  return {
-    isLocal: participant instanceof LocalParticipant,
-    isSpeaking,
-    connectionQuality,
-    publications,
-    subscribedTracks,
-    cameraPublication,
-    microphonePublication,
-    screenSharePublication,
-    metadata,
-  };
+  const [state, setState] = useState(readState);
+  useEffect(() => {
+    const update = () => setState(readState());
+    const events = [
+      ParticipantEvent.TrackMuted,
+      ParticipantEvent.TrackUnmuted,
+      ParticipantEvent.IsSpeakingChanged,
+      ParticipantEvent.ParticipantMetadataChanged,
+      ParticipantEvent.ConnectionQualityChanged,
+      ParticipantEvent.TrackPublished,
+      ParticipantEvent.TrackUnpublished,
+      ParticipantEvent.TrackSubscribed,
+      ParticipantEvent.TrackUnsubscribed,
+      ParticipantEvent.LocalTrackPublished,
+      ParticipantEvent.LocalTrackUnpublished,
+    ] as const;
+    events.forEach((event) => participant.on(event, update));
+    update();
+    return () => {
+      events.forEach((event) => participant.off(event, update));
+    };
+  }, [participant, readState]);
+  return state;
 }

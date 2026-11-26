@@ -1,104 +1,39 @@
-name: Test
+name: Example native builds
 on:
   push:
-    branches: [ main ]
-    paths-ignore:
-      - '**.md'
+    branches: [main, dtelecom-m150]
   pull_request:
-    branches: [ main ]
-    paths-ignore:
-      - '**.md'
 
 jobs:
-  android-compile:
-    runs-on: ubuntu-latest
+  example:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
     steps:
-    - uses: actions/checkout@v2
-
-    - uses: actions/setup-node@v3
-      with:
-        node-version: '16.x'
-        cache: 'yarn'
-        cache-dependency-path: '**/yarn.lock'
-
-    - uses: actions/cache@v2
-      with:
-        path: |
-          ~/.npm
-          ~/node_modules
-          ~/ci/node_modules
-          ~/.config/yarn/global
-        key: ${{ runner.os }}-node-${{ hashFiles('**/yarn.lock') }}
-        restore-keys: |
-          ${{ runner.os }}-node-
-
-    - name: Install Yarn
-      run: |
-        npm install -g yarn
-
-    - name: Yarn
-      run: |
-        yarn install
-        cd ci
-        yarn
-
-    - name: Compile Android (Debug)
-      working-directory: ./ci/android/
-      run: ./gradlew assembleDebug
-
-  ios-compile:
-    runs-on: macos-latest
-    steps:
-    - uses: actions/checkout@v2
-
-    - uses: actions/setup-node@v3
-      with:
-        node-version: '16.x'
-        cache: 'yarn'
-        cache-dependency-path: '**/yarn.lock'
-
-    - uses: actions/cache@v2
-      with:
-        path: |
-          ~/.npm
-          ~/node_modules
-          ~/ci/node_modules
-          ~/.config/yarn/global
-        key: ${{ runner.os }}-node-${{ hashFiles('**/yarn.lock') }}
-        restore-keys: |
-          ${{ runner.os }}-node-
-
-    - name: Cache cocoapods
-      uses: actions/cache@v2
-      with:
-        path: ./ci/ios/Pods
-        key: ${{ runner.os }}-pods-${{ hashFiles('**/Podfile.lock') }}
-        restore-keys: |
-          ${{ runner.os }}-pods-
-
-    - name: Install Yarn
-      run: |
-        npm install -g yarn
-        yarn
-
-    - name: Yarn
-      run: |
-        yarn install
-        cd ci/
-        yarn
-        cd ios/
-        pod install
-
-    - name: Compile iOS
-      working-directory: ./ci/ios/
-      run: |
-        set -o pipefail && \
-        xcodebuild -workspace ci.xcworkspace/ \
-          -scheme ci \
-          -destination generic/platform=iOS \
-          -configuration Debug \
-          CODE_SIGN_IDENTITY="" \
-          CODE_SIGNING_REQUIRED=NO \
-          CODE_SIGN_ENTITLEMENTS="" \
-          CODE_SIGNING_ALLOWED="NO" \
-          clean build | xcpretty
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+          cache: yarn
+      - run: corepack enable
+      - run: yarn install --frozen-lockfile
+      - run: npm pack --pack-destination "$RUNNER_TEMP"
+      - working-directory: example
+        run: npm install --no-save "$RUNNER_TEMP"/dtelecom-react-native-*.tgz
+      - working-directory: example
+        run: npm test && npm run typecheck
+      - if: runner.os == 'Linux'
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+      - if: runner.os == 'Linux'
+        working-directory: example/android
+        run: ./gradlew :app:assembleDebug
+      - if: runner.os == 'macOS'
+        working-directory: example/ios
+        run: |
+          pod install
+          xcodebuild -workspace DtelecomRooms.xcworkspace -scheme DtelecomRooms -configuration Debug -destination 'generic/platform=iOS Simulator' CODE_SIGNING_ALLOWED=NO build

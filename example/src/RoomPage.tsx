@@ -1,433 +1,181 @@
-import * as React from 'react';
-import { useEffect, useRef, useState } from 'react';
-import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-
+import React, { useEffect, useRef, useState } from 'react';
+import { AppState, PermissionsAndroid, Platform, ScrollView, Text, TextInput, View } from 'react-native';
 import {
-  Dimensions,
-  findNodeHandle,
-  Keyboard,
-  ListRenderItem,
-  NativeModules,
-  Platform,
-  SafeAreaView,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-} from 'react-native';
-import type { RootStackParamList } from './App';
-import { RoomControls } from './RoomControls';
-import { ParticipantView } from './ParticipantView';
-import type { TrackPublication } from '@dtelecom/livekit-client';
-import {
-  DataPacket_Kind,
-  Participant,
-  RemoteParticipant,
-  Room,
-  RoomEvent,
-} from '@dtelecom/livekit-client';
-import { AudioSession, useParticipant, useRoom } from '@dtelecom/react-native';
-// @ts-ignore
-import {
-  mediaDevices,
-  ScreenCapturePickerView,
-} from '@dtelecom/react-native-webrtc';
-import { startCallService, stopCallService } from './callservice/CallService';
+  AudioSession, ConnectionState, connectRoom, DataPacket_Kind, Room, RoomEvent,
+  switchCamera, useParticipant, useRoom, VideoView, type Participant, type RemoteParticipant,
+} from '@dtelecom/react-native';
+import type { Session } from '../App';
+import { chatTopic, decodeChat, encodeChat } from './chat';
+import { Action, colors, styles } from './ui';
 
-import 'fastestsmallesttextencoderdecoder';
-import { Footer } from './ui/Footer';
-import { RoomNavBar } from './ui/RoomNavBar';
-import { FlatGrid } from 'react-native-super-grid';
-import ActionSheet, { ActionSheetRef } from 'react-native-actions-sheet';
-import BaseButton from './ui/BaseButton';
-import axios from 'axios';
-
-export const RoomPage = ({
-  navigation,
-  route,
-}: NativeStackScreenProps<RootStackParamList, 'RoomPage'>) => {
-  const [, setIsConnected] = useState(false);
-  const [room] = useState(
-    () =>
-      new Room({
-        adaptiveStream: { pixelDensity: 'screen' },
-      })
-  );
-  const { participants } = useRoom(room);
-  const { slug, url, token, roomName, isAdmin, cameraEnabled, micEnabled } =
-    route.params;
-  const [isCameraFrontFacing, setCameraFrontFacing] = useState(true);
-  const [message, setMessage] = useState('');
-  const [messages, setMessages] = useState<
-    Array<{
-      message: { message: string; timestamp: number };
-      name: string;
-      fromMe: boolean;
-    }>
-  >([]);
-
-  const actionSheetRef = useRef<ActionSheetRef>(null);
-
-  // Perform platform specific call setup.
-  useEffect(() => {
-    startCallService();
-    return () => {
-      stopCallService();
-    };
-  }, [url, token, room]);
-
-  // Connect to room.
-  useEffect(() => {
-    let connect = async () => {
-      // If you wish to configure audio, uncomment the following:
-      // await AudioSession.configureAudio({
-      //   android: {
-      //     preferredOutputList: ["earpiece"],
-      //     audioTypeOptions: AndroidAudioTypePresets.communication
-      //   },
-      //   ios: {
-      //     defaultOutput: "earpiece"
-      //   }
-      // });
-      await AudioSession.startAudioSession();
-      await room.connect(url, token, {});
-      console.log('connected to ', url, ' ', token);
-      setIsConnected(true);
-
-      await room.localParticipant.setCameraEnabled(cameraEnabled);
-      await room.localParticipant.setMicrophoneEnabled(micEnabled);
-    };
-
-    connect();
-    return () => {
-      if (isAdmin) {
-        axios.post('https://dmeet.org/api/deleteRoom', {
-          slug,
-          identity: room.localParticipant.identity,
-        });
-      }
-      room.disconnect();
-      AudioSession.stopAudioSession();
-    };
-  }, [url, token, room, micEnabled, cameraEnabled, isAdmin, slug]);
-
-  // Setup room listeners
-  useEffect(() => {
-    const dataReceived = (
-      payload: Uint8Array,
-      participant?: RemoteParticipant
-    ) => {
-      //@ts-ignore
-      let decoder = new TextDecoder('utf-8');
-      let message = decoder.decode(payload);
-
-      setMessages((prevState) => [
-        ...prevState,
-        {
-          name: participant?.name || '',
-          message: JSON.parse(message),
-          fromMe: participant?.identity === room.localParticipant.identity,
-        },
-      ]);
-      console.log(message);
-    };
-    room.on(RoomEvent.DataReceived, dataReceived);
-
-    return () => {
-      room.off(RoomEvent.DataReceived, dataReceived);
-    };
-  });
-
-  // Setup views.
-  // const stageView = participants.length > 0 && (
-  //   <ParticipantView participant={participants[0]} style={styles.stage} />
-  // );
-
-  const renderParticipant: ListRenderItem<Participant> = ({ item }) => {
-    return (
-      <ParticipantView participant={item} style={styles.otherParticipantView} />
-    );
-  };
-
-  const { cameraPublication, microphonePublication, screenSharePublication } =
-    useParticipant(room.localParticipant);
-
-  // Prepare for iOS screenshare.
-  const screenCaptureRef = React.useRef(null);
-  const screenCapturePickerView = Platform.OS === 'ios' && (
-    <ScreenCapturePickerView ref={screenCaptureRef} />
-  );
-  const startBroadcast = async () => {
-    if (Platform.OS === 'ios') {
-      const reactTag = findNodeHandle(screenCaptureRef.current);
-      await NativeModules.ScreenCapturePickerViewManager.show(reactTag);
-      room.localParticipant.setScreenShareEnabled(true);
-    } else {
-      room.localParticipant.setScreenShareEnabled(true);
-    }
-  };
-
+function ParticipantTile({ participant, local, mirror }: {
+  participant: Participant; local: boolean; mirror: boolean;
+}) {
+  const { cameraPublication, screenSharePublication } = useParticipant(participant);
   return (
-    <SafeAreaView style={styles.container}>
-      <RoomNavBar count={participants.length} roomName={roomName} slug={slug} />
-
-      <FlatGrid
-        itemDimension={200}
-        data={participants}
-        renderItem={renderParticipant}
-        spacing={10}
-        horizontal={true}
-        maxItemsPerRow={2}
-      />
-
-      <RoomControls
-        micEnabled={isTrackEnabled(microphonePublication)}
-        setMicEnabled={(enabled: boolean) => {
-          room.localParticipant.setMicrophoneEnabled(enabled);
-        }}
-        cameraEnabled={isTrackEnabled(cameraPublication)}
-        setCameraEnabled={(enabled: boolean) => {
-          room.localParticipant.setCameraEnabled(enabled);
-        }}
-        switchCamera={async () => {
-          let facingModeStr = !isCameraFrontFacing ? 'front' : 'environment';
-          setCameraFrontFacing(!isCameraFrontFacing);
-
-          let devices = await mediaDevices.enumerateDevices();
-          var newDevice;
-          //@ts-ignore
-          for (const device of devices) {
-            //@ts-ignore
-            if (
-              device.kind === 'videoinput' &&
-              device.facing === facingModeStr
-            ) {
-              newDevice = device;
-              break;
-            }
-          }
-
-          if (newDevice == null) {
-            return;
-          }
-
-          //@ts-ignore
-          await room.switchActiveDevice('videoinput', newDevice.deviceId);
-        }}
-        screenShareEnabled={isTrackEnabled(screenSharePublication)}
-        setScreenShareEnabled={(enabled: boolean) => {
-          if (enabled) {
-            startBroadcast();
-          } else {
-            room.localParticipant.setScreenShareEnabled(enabled);
-          }
-        }}
-        sendData={(message: string) => {
-          //@ts-ignore
-          let encoder = new TextEncoder();
-          let encodedData = encoder.encode(message);
-          room.localParticipant.publishData(
-            encodedData,
-            DataPacket_Kind.RELIABLE,
-            { topic: 'lk-chat-topic' }
-          );
-        }}
-        onSimulate={(scenario) => {
-          room.simulateScenario(scenario);
-        }}
-        onDisconnectClick={async () => {
-          navigation.popToTop();
-        }}
-        openChat={() => {
-          actionSheetRef.current?.show();
-        }}
-      />
-
-      {screenCapturePickerView}
-
-      <ActionSheet initialSnapIndex={0} snapPoints={[80]} ref={actionSheetRef}>
-        <View style={styles.chatContainer}>
-          <View style={{ height: '78%' }}>
-            <ScrollView
-              style={{
-                transform: [{ scaleY: -1 }],
-                flex: 1,
-              }}
-              horizontal={false}
-            >
-              <View style={{ transform: [{ scaleY: -1 }], paddingBottom: 8 }}>
-                {messages.map((message, index) => {
-                  return (
-                    <View key={index} style={styles.message}>
-                      <View
-                        style={{
-                          flexDirection: 'row',
-                          justifyContent: 'center',
-                        }}
-                      >
-                        <Text style={styles.messageName}>{message.name}</Text>
-                        <Text style={styles.messageTime}>
-                          {
-                            new Date(message.message.timestamp)
-                              .toLocaleTimeString()
-                              .split(':')[0]
-                          }
-                          :
-                          {
-                            new Date(message.message.timestamp)
-                              .toLocaleTimeString()
-                              .split(':')[1]
-                          }
-                        </Text>
-                      </View>
-
-                      <View
-                        style={{
-                          ...styles.messageTextBubble,
-                          backgroundColor: message.fromMe
-                            ? '#2E3031'
-                            : '#324F36',
-                        }}
-                      >
-                        <Text key={index} style={styles.messageText}>
-                          {message.message.message}
-                        </Text>
-                      </View>
-                    </View>
-                  );
-                })}
-              </View>
-            </ScrollView>
-          </View>
-
-          <View
-            style={{
-              flexDirection: 'row',
-              gap: 8,
-              marginBottom: 16,
-              paddingHorizontal: 12,
-            }}
-          >
-            <TextInput
-              style={styles.chatInput}
-              onChangeText={setMessage}
-              value={message}
-              placeholder="Enter your message"
-            />
-            <BaseButton
-              style={styles.chatButton}
-              onPress={() => {
-                const msg = {
-                  message,
-                  timestamp: Date.now(),
-                };
-                //@ts-ignore
-                let encoder = new TextEncoder();
-                let encodedData = encoder.encode(JSON.stringify(msg));
-                setMessages((prevState) => [
-                  ...prevState,
-                  {
-                    name: room.localParticipant?.name || '',
-                    message: msg,
-                    fromMe: true,
-                  },
-                ]);
-                room.localParticipant.publishData(
-                  encodedData,
-                  DataPacket_Kind.RELIABLE,
-                  { topic: 'lk-chat-topic' }
-                );
-                setMessage('');
-                Keyboard.dismiss();
-              }}
-            >
-              <Text style={styles.chatButtonText}>Send</Text>
-            </BaseButton>
-          </View>
-        </View>
-      </ActionSheet>
-
-      <Footer />
-    </SafeAreaView>
+    <View style={styles.card}>
+      <Text style={styles.label}>{participant.name || participant.identity}{local ? ' (you)' : ''}</Text>
+      {cameraPublication?.videoTrack && !cameraPublication.isMuted &&
+        <VideoView style={styles.video} videoTrack={cameraPublication.videoTrack}
+          mirror={local && mirror} objectFit="cover" useTextureView={Platform.OS === 'android'} />}
+      {screenSharePublication?.videoTrack && !screenSharePublication.isMuted && <>
+        <Text style={styles.detail}>Shared screen</Text>
+        <VideoView style={styles.video} videoTrack={screenSharePublication.videoTrack} objectFit="contain" />
+      </>}
+    </View>
   );
-};
-
-function isTrackEnabled(pub?: TrackPublication): boolean {
-  return !(pub?.isMuted ?? true);
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  otherParticipantsList: {
-    flex: 1,
-    gap: 8,
-    overflow: 'scroll',
-    flexWrap: 'wrap',
-  },
-  otherParticipantView: {
-    flex: 1,
-    height: '100%',
-    width: Dimensions.get('screen').width - 20,
-  },
-  chatContainer: {
-    height: '100%',
-    backgroundColor: '#212121',
-    paddingBottom: '20%',
-  },
-  message: {
-    paddingHorizontal: 12,
-    maxWidth: '80%',
-    gap: 4,
-    marginBottom: 16,
-  },
-  messageName: {
-    color: '#777575',
-    fontSize: 14,
-  },
-  messageTime: {
-    marginLeft: 'auto',
-    color: '#777575',
-    fontSize: 14,
-  },
-  messageTextBubble: {
-    backgroundColor: '#324F36',
-    paddingHorizontal: 12,
-    paddingVertical: 4,
-    borderRadius: 5,
-    alignSelf: 'flex-start',
-  },
-  messageText: {
-    color: '#fff',
-    fontSize: 16,
-    alignSelf: 'flex-start',
-    backgroundColor: 'transparent',
-  },
-  chatInput: {
-    flex: 1,
-    height: 42,
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: 5,
-    color: '#fff',
-    borderWidth: 1,
-    borderColor: '#777575',
-  },
-  chatButton: {
-    backgroundColor: '#FFFFFF',
-    height: 42,
-    width: 100,
-    borderRadius: 5,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  chatButtonText: {
-    color: '#000',
-  },
-});
+export function RoomPage({ session, onLeave }: { session: Session; onLeave: () => void }) {
+  const [room] = useState(() => new Room({ adaptiveStream: true, dynacast: true }));
+  const { participants, state } = useRoom(room);
+  const { cameraPublication, microphonePublication } = useParticipant(room.localParticipant);
+  const cameraEnabled = !!cameraPublication && !cameraPublication.isMuted;
+  const micEnabled = !!microphonePublication && !microphonePublication.isMuted;
+  const [mirror, setMirror] = useState(true);
+  const [error, setError] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [leaving, setLeaving] = useState(false);
+  const action = useRef(false);
+  const active = useRef(true);
+  const closing = useRef<Promise<void> | null>(null);
+  const setup = useRef<Promise<void> | null>(null);
+  const [outputs, setOutputs] = useState<string[]>([]);
+  const [currentOutput, setCurrentOutput] = useState('');
+  const [draft, setDraft] = useState('');
+  const [messages, setMessages] = useState<{sender: string; text: string}[]>([]);
+  const { admission } = session;
+
+  function report(cause: unknown) {
+    if (active.current) setError(cause instanceof Error ? cause.message : 'Unable to complete this action.');
+  }
+
+  function close() {
+    if (!closing.current) {
+      active.current = false;
+      closing.current = (async () => {
+        try {
+          // Cancel an in-flight connection as well as an established room.
+          await room.disconnect();
+          await setup.current;
+        } finally {
+          await AudioSession.stopAudioSession();
+        }
+      })();
+    }
+    return closing.current;
+  }
+
+  useEffect(() => {
+    const receive = (bytes: Uint8Array, sender?: RemoteParticipant, _kind?: DataPacket_Kind, topic?: string) => {
+      const text = decodeChat(bytes, topic);
+      if (text) setMessages(previous => [...previous, { sender: sender?.name || sender?.identity || 'Participant', text }]);
+    };
+    room.on(RoomEvent.DataReceived, receive);
+    const routes = AudioSession.addAudioRouteChangeListener(route => {
+      if (!active.current) return;
+      setCurrentOutput(route.selectedOutput);
+      if (Platform.OS === 'android') setOutputs(route.availableOutputs);
+    });
+    setup.current = (async () => {
+      await AudioSession.startAudioSession();
+      if (!active.current) return;
+      await connectRoom(room, admission);
+      if (!active.current) return;
+      const [actions, route] = await Promise.all([AudioSession.getAudioOutputs(), AudioSession.getAudioRoute()]);
+      if (active.current) {
+        setOutputs(actions);
+        setCurrentOutput(route.selectedOutput);
+      }
+    })().catch(report);
+
+    let restoreCamera = false;
+    let cameraWork = Promise.resolve();
+    const appState = AppState.addEventListener('change', next => {
+      cameraWork = cameraWork.then(async () => {
+        if (!active.current || room.state !== ConnectionState.Connected) return;
+        if (next === 'background' && room.localParticipant.isCameraEnabled) {
+          restoreCamera = true;
+          await room.localParticipant.setCameraEnabled(false);
+        } else if (next === 'active' && restoreCamera) {
+          restoreCamera = false;
+          await room.localParticipant.setCameraEnabled(true);
+        }
+      }).catch(report);
+    });
+    return () => {
+      appState.remove();
+      routes.remove();
+      room.off(RoomEvent.DataReceived, receive);
+      close().catch(() => {});
+    };
+    // Session and room are immutable for this mounted screen.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [room, admission]);
+
+  async function perform(operation: () => Promise<unknown>) {
+    if (action.current || !active.current) return;
+    action.current = true;
+    setBusy(true);
+    setError('');
+    try { await operation(); } catch (cause) { report(cause); }
+    finally {
+      action.current = false;
+      if (active.current) setBusy(false);
+    }
+  }
+
+  const connected = state === ConnectionState.Connected;
+  const disabled = busy || leaving || !connected;
+
+  return (
+    <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
+      <Text accessibilityRole="header" style={styles.title}>{session.roomName}</Text>
+      <Text style={styles.detail}>{admission.role} · {state}</Text>
+      <Action label={leaving ? 'Leaving…' : 'Leave room'} disabled={leaving} onPress={async () => {
+        setLeaving(true);
+        try { await close(); } catch (cause) { report(cause); } finally { onLeave(); }
+      }} />
+      {error ? <Text accessibilityRole="alert" style={styles.error}>{error}</Text> : null}
+      {admission.role !== 'viewer' &&
+        <View style={styles.row}>
+          <Action label={micEnabled ? 'Mute mic' : 'Start mic'} disabled={disabled}
+            onPress={() => perform(() => room.localParticipant.setMicrophoneEnabled(!micEnabled))} />
+          <Action label={cameraEnabled ? 'Stop camera' : 'Start camera'} disabled={disabled}
+            onPress={() => perform(() => room.localParticipant.setCameraEnabled(!cameraEnabled))} />
+          {cameraEnabled && <Action label="Flip camera" disabled={disabled}
+            onPress={() => perform(async () => setMirror(await switchCamera(room) === 'user'))} />}
+        </View>}
+      <View style={styles.row}>
+        <Action label="Audio outputs" disabled={disabled} onPress={() => perform(async () => {
+          if (Platform.OS === 'ios') {
+            await AudioSession.showAudioRoutePicker();
+          } else {
+            if (Platform.OS === 'android' && Number(Platform.Version) >= 31) {
+              await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.BLUETOOTH_CONNECT);
+            }
+            setOutputs(await AudioSession.getAudioOutputs());
+          }
+        })} />
+        {currentOutput ? <Text style={styles.detail}>Using {currentOutput}</Text> : null}
+        {outputs.map(output => <Action key={output} label={output.replace(/_/g, ' ')} disabled={disabled}
+          onPress={() => perform(() => AudioSession.selectAudioOutput(output))} />)}
+      </View>
+      {participants.map(participant =>
+        <ParticipantTile key={participant.sid || participant.identity} participant={participant}
+          local={participant === room.localParticipant} mirror={mirror} />)}
+      <Text accessibilityRole="header" style={styles.section}>Room chat</Text>
+      {messages.map((message, index) => <Text key={index} style={styles.label}>{message.sender}: {message.text}</Text>)}
+      <TextInput style={styles.input} accessibilityLabel="Chat message" placeholder="Message the room"
+        placeholderTextColor={colors.muted} value={draft} onChangeText={setDraft} editable={!disabled} />
+      <Action label="Send" disabled={disabled || !draft.trim()} primary onPress={() => perform(async () => {
+        const text = draft.trim();
+        await room.localParticipant.publishData(encodeChat(text), DataPacket_Kind.RELIABLE, { topic: chatTopic });
+        if (active.current) {
+          setMessages(previous => [...previous, { sender: 'You', text }]);
+          setDraft('');
+        }
+      })} />
+    </ScrollView>
+  );
+}

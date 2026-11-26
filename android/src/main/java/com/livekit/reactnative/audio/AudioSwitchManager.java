@@ -3,8 +3,6 @@ package com.livekit.reactnative.audio;
 import android.content.Context;
 import android.media.AudioAttributes;
 import android.media.AudioManager;
-import android.os.Handler;
-import android.os.Looper;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -15,7 +13,6 @@ import com.twilio.audioswitch.AudioSwitch;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 
 import kotlin.Unit;
 import kotlin.jvm.functions.Function2;
@@ -23,25 +20,22 @@ import kotlin.jvm.functions.Function2;
 public class AudioSwitchManager {
     @NonNull
     private final Context context;
-    @NonNull
-    private final AudioManager audioManager;
 
     public boolean loggingEnabled;
     @NonNull
     public Function2<
             ? super List<? extends AudioDevice>,
             ? super AudioDevice,
-            Unit> audioDeviceChangeListener = (devices, currentDevice) -> null;
+            Unit> audioDeviceChangeListener = (devices, currentDevice) -> Unit.INSTANCE;
 
     @NonNull
     public AudioManager.OnAudioFocusChangeListener audioFocusChangeListener = (i -> {
     });
 
     @NonNull
-    public List<Class<? extends AudioDevice>> preferredDeviceList;
+    private List<Class<? extends AudioDevice>> preferredDeviceList;
 
-    // AudioSwitch is not threadsafe, so all calls should be done on the main thread.
-    private final Handler handler = new Handler(Looper.getMainLooper());
+    // The module dispatches every lifecycle, route and configuration call to the UI thread.
 
     @Nullable
     private AudioSwitch audioSwitch;
@@ -115,7 +109,6 @@ public class AudioSwitchManager {
 
     public AudioSwitchManager(@NonNull Context context) {
         this.context = context;
-        this.audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
 
         preferredDeviceList = new ArrayList<>();
         preferredDeviceList.add(AudioDevice.BluetoothHeadset.class);
@@ -125,40 +118,32 @@ public class AudioSwitchManager {
     }
 
     public void start() {
-        if (audioSwitch == null) {
-            handler.removeCallbacksAndMessages(null);
-            handler.postAtFrontOfQueue(() -> {
-                audioSwitch = new AudioSwitch(
-                        context,
-                        loggingEnabled,
-                        audioFocusChangeListener,
-                        preferredDeviceList
-                );
-                audioSwitch.setManageAudioFocus(manageAudioFocus);
-                audioSwitch.setFocusMode(focusMode);
-                audioSwitch.setAudioMode(audioMode);
-                audioSwitch.setAudioStreamType(audioStreamType);
-                audioSwitch.setAudioAttributeContentType(audioAttributeContentType);
-                audioSwitch.setAudioAttributeUsageType(audioAttributeUsageType);
-                audioSwitch.setForceHandleAudioRouting(forceHandleAudioRouting);
-                audioSwitch.start(audioDeviceChangeListener);
-                audioSwitch.activate();
-            });
+        if (audioSwitch != null) return;
+        audioSwitch = new AudioSwitch(context, loggingEnabled, audioFocusChangeListener, preferredDeviceList);
+        try {
+            audioSwitch.setManageAudioFocus(manageAudioFocus);
+            audioSwitch.setFocusMode(focusMode);
+            audioSwitch.setAudioMode(audioMode);
+            audioSwitch.setAudioStreamType(audioStreamType);
+            audioSwitch.setAudioAttributeContentType(audioAttributeContentType);
+            audioSwitch.setAudioAttributeUsageType(audioAttributeUsageType);
+            audioSwitch.setForceHandleAudioRouting(forceHandleAudioRouting);
+            audioSwitch.start(audioDeviceChangeListener);
+            audioSwitch.activate();
+        } catch (RuntimeException failure) {
+            stop();
+            throw failure;
         }
     }
 
     public void stop() {
-        handler.removeCallbacksAndMessages(null);
-        handler.postAtFrontOfQueue(() -> {
-            if (audioSwitch != null) {
+        if (audioSwitch != null) {
+            try {
                 audioSwitch.stop();
+            } finally {
+                audioSwitch = null;
             }
-            audioSwitch = null;
-        });
-    }
-
-    public void setMicrophoneMute(boolean mute) {
-        audioManager.setMicrophoneMute(mute);
+        }
     }
 
     @Nullable
@@ -181,86 +166,74 @@ public class AudioSwitchManager {
         }
     }
 
-    public void selectAudioOutput(@NonNull Class<? extends AudioDevice> audioDeviceClass) {
-        handler.post(() -> {
-            if (audioSwitch != null) {
-                List<AudioDevice> devices = availableAudioDevices();
-                AudioDevice audioDevice = null;
+    public void setPreferredDeviceList(List<Class<? extends AudioDevice>> devices) {
+        preferredDeviceList = new ArrayList<>(devices);
+        if (audioSwitch != null) audioSwitch.setPreferredDeviceList(preferredDeviceList);
+    }
 
-                for (AudioDevice device : devices) {
-                    if (device.getClass().equals(audioDeviceClass)) {
-                        audioDevice = device;
-                        break;
-                    }
-                }
-
-                if (audioDevice != null) {
-                    audioSwitch.selectDevice(audioDevice);
-                }
+    public boolean selectAudioOutput(@Nullable AudioDeviceKind kind) {
+        if (kind == null || audioSwitch == null) return false;
+        for (AudioDevice device : audioSwitch.getAvailableAudioDevices()) {
+            if (kind.audioDeviceClass.isInstance(device)) {
+                audioSwitch.selectDevice(device);
+                return kind.audioDeviceClass.isInstance(audioSwitch.getSelectedAudioDevice());
             }
-        });
+        }
+        return false;
     }
 
-    public void enableSpeakerphone(boolean enable) {
-        if (enable) {
-            audioManager.setSpeakerphoneOn(true);
-        } else {
-            audioManager.setSpeakerphoneOn(false);
-        }
-    }
-
-    public void selectAudioOutput(@Nullable AudioDeviceKind kind) {
-        if (kind != null) {
-            selectAudioOutput(kind.audioDeviceClass);
-        }
+    public boolean clearSelection() {
+        if (audioSwitch == null) return false;
+        audioSwitch.selectDevice(null);
+        return true;
     }
 
     public void setManageAudioFocus(boolean manage) {
         this.manageAudioFocus = manage;
         if (audioSwitch != null) {
-            Objects.requireNonNull(audioSwitch).setManageAudioFocus(this.manageAudioFocus);
+            audioSwitch.setManageAudioFocus(this.manageAudioFocus);
         }
     }
 
     public void setFocusMode(int focusMode) {
         this.focusMode = focusMode;
         if (audioSwitch != null) {
-            Objects.requireNonNull(audioSwitch).setFocusMode(this.focusMode);
+            audioSwitch.setFocusMode(this.focusMode);
         }
     }
 
     public void setAudioMode(int audioMode) {
         this.audioMode = audioMode;
         if (audioSwitch != null) {
-            Objects.requireNonNull(audioSwitch).setAudioMode(this.audioMode);
+            audioSwitch.setAudioMode(this.audioMode);
         }
     }
 
     public void setAudioStreamType(int streamType) {
         this.audioStreamType = streamType;
         if (audioSwitch != null) {
-            Objects.requireNonNull(audioSwitch).setAudioStreamType(this.audioStreamType);
+            audioSwitch.setAudioStreamType(this.audioStreamType);
         }
     }
 
     public void setAudioAttributesUsageType(int usageType) {
         this.audioAttributeUsageType = usageType;
         if (audioSwitch != null) {
-            Objects.requireNonNull(audioSwitch).setAudioAttributeUsageType(this.audioAttributeUsageType);
+            audioSwitch.setAudioAttributeUsageType(this.audioAttributeUsageType);
         }
     }
 
     public void setAudioAttributesContentType(int contentType) {
         this.audioAttributeContentType = contentType;
         if (audioSwitch != null) {
-            Objects.requireNonNull(audioSwitch).setAudioAttributeContentType(this.audioAttributeContentType);
+            audioSwitch.setAudioAttributeContentType(this.audioAttributeContentType);
         }
     }
 
     public void setForceHandleAudioRouting(boolean force) {
         this.forceHandleAudioRouting = force;
         if (audioSwitch != null) {
-            Objects.requireNonNull(audioSwitch).setForceHandleAudioRouting(this.forceHandleAudioRouting);
+            audioSwitch.setForceHandleAudioRouting(this.forceHandleAudioRouting);
         }
     }
 }
