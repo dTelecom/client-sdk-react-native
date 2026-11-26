@@ -24,7 +24,7 @@ The Android example installs as `com.example.dtelecomrooms`. Enable USB debuggin
 
 1. Create a room in [Meet](https://dtelecom-meet.vercel.app/) or start a stream in [Live](https://dtelecom-live.vercel.app/).
 2. Tap **Scan QR** in the mobile app and point the camera at the invite QR code, or paste the `/prejoin?room=…` invite. Scanning fills the invite field. Choose a name distinct from the browser participant and tap **Join room**. You can paste an invite if camera access is unavailable.
-3. In Meet, use **Start mic** and **Start camera** to publish. Browser camera and shared-screen tracks appear in the app. In Live, an ordinary invite opens in viewer mode with playback and chat. A signed host invite enables broadcasting. Audio and video start only after the user taps the relevant control.
+3. In Meet, use **Start mic** and **Start camera** to publish. Browser camera and shared-screen tracks appear in the app. In Live, an ordinary invite opens in viewer mode with playback and chat. A signed host invite enables broadcasting. Remote audio and video play on join. Your microphone and camera start when you choose to publish.
 4. Send a message to the room. The sender and browser Chat panel use the same data channel. Leave and rejoin using the original invite.
 
 Configure other deployments by adding their exact origins and product to `issuers` in [src/invite.ts](src/invite.ts). Use HTTPS for deployed backends. An explicitly configured loopback origin also works for local development on iOS Simulator or Android Emulator. Android uses `10.0.2.2` to reach the host. A signed host fragment belongs to its issuing deployment and should be shared only with the intended host.

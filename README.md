@@ -1,6 +1,6 @@
 # dTelecom React Native SDK
 
-The dTelecom React Native SDK 2.0 for iOS and Android connects to dTelecom rooms, publishes camera and microphone tracks, renders remote video and exchanges room data. It uses the same room client as dTelecom web apps. The [example app](example/README.md) accepts dTelecom Meet and Live invites.
+The dTelecom React Native SDK 2.0 for iOS and Android connects to dTelecom rooms, publishes camera and microphone tracks, renders remote video and exchanges room data. It uses the same room client as dTelecom web apps. The [iOS and Android example app](example/README.md) joins [Meet meetings](https://dtelecom-meet.vercel.app/) and [Live streams](https://dtelecom-live.vercel.app/) using the browser’s invite link or QR code. In both apps, mobile participants can hear desktop audio and see camera video and shared screens.
 
 ## Install
 
