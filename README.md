@@ -2,7 +2,7 @@
 
 <!--BEGIN_DESCRIPTION-->`@dtelecom/react-native@1.3.0` and its `@dtelecom/react-native-webrtc` 104.x dependency are legacy releases for existing integrations. They are unsupported for new dTelecom Cloud apps.<!--END_DESCRIPTION-->
 
-For new apps that can use a browser, follow the [web quickstart](https://docs.dtelecom.org/quickstart/). Check the [SDK catalog](https://docs.dtelecom.org/reference/sdks/) for public React Native availability.
+For new iOS and Android apps, install the current [dTelecom React Native SDK](https://www.npmjs.com/package/@dtelecom/react-native). Its [example app](https://github.com/dTelecom/client-sdk-react-native/tree/dtelecom-m150/example) joins the same Meet meetings and Live streams as a browser using an invite link or QR code.
 
 ## Installation for existing 1.3.0 apps
 
