@@ -31,9 +31,25 @@ jobs:
           java-version: 17
       - if: runner.os == 'Linux'
         working-directory: example/android
-        run: ./gradlew :app:assembleDebug
+        run: |
+          ./gradlew :app:assembleDebug
+          ./gradlew -I ../../ci/capture-processing/android.gradle \
+            -PcaptureTestSources="$GITHUB_WORKSPACE/ci/capture-processing/android" \
+            :dtelecom_react-native:testDebugUnitTest --tests org.dtelecom.ci.CaptureProcessingTest
       - if: runner.os == 'macOS'
         working-directory: example/ios
         run: |
           pod install
           xcodebuild -workspace DtelecomRooms.xcworkspace -scheme DtelecomRooms -configuration Debug -destination 'generic/platform=iOS Simulator' CODE_SIGNING_ALLOWED=NO build
+      - name: Check public Apple capture processor lifecycle
+        if: runner.os == 'macOS'
+        run: bash ci/capture-processing/check-apple.sh example
+      - name: Check iOS native call actions before React Native starts
+        if: runner.os == 'macOS'
+        run: bash ci/system-calls/check-apple.sh example
+      - name: Check installed bridge audio-session ownership and retries
+        if: runner.os == 'macOS'
+        run: bash example/node_modules/@dtelecom/react-native-webrtc/tools/check-audio-session-observer.sh example
+      - name: Check native encrypted video and recovery with a corrected key
+        if: runner.os == 'macOS'
+        run: bash ci/encrypted-media/check-ios.sh example

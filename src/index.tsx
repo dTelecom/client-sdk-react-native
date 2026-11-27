@@ -25,6 +25,13 @@ export function registerGlobals(): void {
 }
 
 export * from './components/VideoView';
+export * from './components/LiveKitRoom';
+export * from './components/VideoTrack';
+export * from './roomTracks';
+export * from './e2ee';
+export * from './useDataChannel';
+export { SystemCalls } from './systemCalls';
+export type { SystemCallAction, SystemCallEvent } from './systemCalls';
 export * from './useParticipant';
 export * from './useRoom';
 export * from './connectRoom';
@@ -46,15 +53,18 @@ export {
   ConnectionState,
   ParticipantEvent,
   ConnectionQuality,
+  setLogLevel,
+  LogLevel,
   DataPacket_Kind,
   DisconnectReason,
   Track,
   TrackEvent,
   LocalParticipant,
+  createLocalVideoTrack,
   LocalVideoTrack,
   RemoteVideoTrack,
   Participant,
   RemoteParticipant,
   TrackPublication,
 } from '@dtelecom/livekit-client';
-export type { RoomConnectOptions, VideoTrack } from '@dtelecom/livekit-client';
+export type { RoomConnectOptions } from '@dtelecom/livekit-client';

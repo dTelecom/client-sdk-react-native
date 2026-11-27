@@ -1,0 +1,10 @@
+// Load this fixture into the installed wrapper's Android unit-test source set.
+// Test dependencies belong to this CI consumer and are absent from the SDK package.
+gradle.beforeProject { project ->
+    if (project.path == ':dtelecom_react-native') {
+        project.plugins.withId('com.android.library') {
+            project.android.sourceSets.test.java.srcDir(project.property('captureTestSources'))
+            project.dependencies.add('testImplementation', 'junit:junit:4.13.2')
+        }
+    }
+}

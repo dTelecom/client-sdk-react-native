@@ -1,5 +1,6 @@
 package com.livekit.reactnative
 
+import com.livekit.reactnative.calls.DtelecomSystemCallsModule
 import com.facebook.react.ReactPackage
 import com.facebook.react.bridge.NativeModule
 import com.facebook.react.bridge.ReactApplicationContext
@@ -8,7 +9,7 @@ import com.facebook.react.uimanager.ViewManager
 
 class DtelecomReactNativePackage : ReactPackage {
     override fun createNativeModules(reactContext: ReactApplicationContext): List<NativeModule> {
-        return listOf(DtelecomReactNativeModule(reactContext))
+        return listOf(DtelecomReactNativeModule(reactContext), DtelecomSystemCallsModule(reactContext))
     }
 
     override fun createViewManagers(reactContext: ReactApplicationContext): List<ViewManager<*, *>> {

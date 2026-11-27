@@ -5,23 +5,23 @@ import com.twilio.audioswitch.AudioDevice
 import com.facebook.react.bridge.*
 import com.livekit.reactnative.audio.AudioDeviceKind
 import com.livekit.reactnative.audio.AudioManagerUtils
-import com.livekit.reactnative.audio.AudioSwitchManager
+import com.livekit.reactnative.calls.SystemCallController
 
 
 class DtelecomReactNativeModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
 
-    private val audioManager = AudioSwitchManager(reactContext.applicationContext)
+    private val audioManager = SystemCallController.audioManager(reactContext)
     @Volatile private var routeListeners = 0
 
-    init {
-        audioManager.audioDeviceChangeListener = { devices, selected ->
+    private val routeListener: (List<AudioDevice>, AudioDevice?) -> Unit = { devices, selected ->
             if (routeListeners > 0 && reactApplicationContext.hasActiveReactInstance()) {
                 reactApplicationContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter::class.java)
                     .emit("dTelecomAudioRouteChanged", route(devices, selected))
             }
             Unit
-        }
     }
+
+    init { audioManager.audioDeviceChangeListener = routeListener }
 
     private fun onMain(promise: Promise, block: () -> Any?) {
         UiThreadUtil.runOnUiThread {
@@ -39,7 +39,7 @@ class DtelecomReactNativeModule(reactContext: ReactApplicationContext) : ReactCo
 
     @ReactMethod
     fun configureAudio(config: ReadableMap, promise: Promise) = onMain(promise) {
-        applyConfiguration(config)
+        if (!SystemCallController.ownsAudio) applyConfiguration(config)
         null
     }
 
@@ -123,7 +123,7 @@ class DtelecomReactNativeModule(reactContext: ReactApplicationContext) : ReactCo
 
     @ReactMethod
     fun stopAudioSession(promise: Promise) = onMain(promise) {
-        audioManager.stop()
+        if (!SystemCallController.ownsAudio) audioManager.stop()
         null
     }
 
@@ -159,7 +159,12 @@ class DtelecomReactNativeModule(reactContext: ReactApplicationContext) : ReactCo
 
     override fun invalidate() {
         routeListeners = 0
-        UiThreadUtil.runOnUiThread { audioManager.stop() }
+        UiThreadUtil.runOnUiThread {
+            if (audioManager.audioDeviceChangeListener === routeListener) {
+                audioManager.audioDeviceChangeListener = { _, _ -> Unit }
+                if (!SystemCallController.ownsAudio) audioManager.stop()
+            }
+        }
         super.invalidate()
     }
 

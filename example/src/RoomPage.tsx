@@ -1,12 +1,15 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { AppState, PermissionsAndroid, Platform, ScrollView, Text, TextInput, View } from 'react-native';
 import {
-  AudioSession, ConnectionState, connectRoom, DataPacket_Kind, Room, RoomEvent,
+  AudioSession, ConnectionState, connectRoom, DataPacket_Kind, RemoteAudioDecryptionError, RoomEvent,
   switchCamera, useParticipant, useRoom, VideoView, type AudioRoute, type Participant, type RemoteParticipant,
 } from '@dtelecom/react-native';
 import type { Session } from '../App';
 import { chatTopic, decodeChat, encodeChat } from './chat';
+import { remoteAudioWarnings } from './remoteAudioWarnings';
 import { Action, colors, styles } from './ui';
+
+const encryptionMessage = 'Media encryption failed. Check the shared room key.';
 
 function ParticipantTile({ participant, local, mirror }: {
   participant: Participant; local: boolean; mirror: boolean;
@@ -27,13 +30,14 @@ function ParticipantTile({ participant, local, mirror }: {
 }
 
 export function RoomPage({ session, onLeave }: { session: Session; onLeave: () => void }) {
-  const [room] = useState(() => new Room({ adaptiveStream: true, dynacast: true }));
+  const { room } = session;
   const { participants, state } = useRoom(room);
   const { cameraPublication, microphonePublication } = useParticipant(room.localParticipant);
   const cameraEnabled = !!cameraPublication && !cameraPublication.isMuted;
   const micEnabled = !!microphonePublication && !microphonePublication.isMuted;
   const [mirror, setMirror] = useState(true);
   const [error, setError] = useState('');
+  const [audioWarning, setAudioWarning] = useState(false);
   const [busy, setBusy] = useState(false);
   const [leaving, setLeaving] = useState(false);
   const action = useRef(false);
@@ -71,6 +75,23 @@ export function RoomPage({ session, onLeave }: { session: Session; onLeave: () =
       const text = decodeChat(bytes, topic);
       if (text) setMessages(previous => [...previous, { sender: sender?.name || sender?.identity || 'Participant', text }]);
     };
+    const warnings = remoteAudioWarnings(track => {
+      for (const participant of room.participants.values()) {
+        for (const publication of participant.audioTracks.values()) {
+          if (publication.track?.mediaStreamTrack === track) return publication;
+        }
+      }
+    }, setAudioWarning);
+    const encryptionError = (cause: Error) => {
+      if (cause instanceof RemoteAudioDecryptionError) warnings.add(cause);
+      else report(new Error(encryptionMessage));
+    };
+    const publicationEvents = [
+      RoomEvent.TrackSubscribed, RoomEvent.TrackUnsubscribed, RoomEvent.TrackUnpublished,
+      RoomEvent.TrackMuted, RoomEvent.TrackUnmuted, RoomEvent.ParticipantDisconnected, RoomEvent.Disconnected,
+    ];
+    for (const event of publicationEvents) room.on(event, warnings.publicationChanged);
+    room.on(RoomEvent.EncryptionError, encryptionError);
     room.on(RoomEvent.DataReceived, receive);
     const updateRoute = (route: AudioRoute) => {
       if (!active.current) return;
@@ -103,6 +124,9 @@ export function RoomPage({ session, onLeave }: { session: Session; onLeave: () =
     return () => {
       appState.remove();
       routes.remove();
+      room.off(RoomEvent.EncryptionError, encryptionError);
+      for (const event of publicationEvents) room.off(event, warnings.publicationChanged);
+      warnings.dispose();
       room.off(RoomEvent.DataReceived, receive);
       close().catch(() => {});
     };
@@ -124,16 +148,17 @@ export function RoomPage({ session, onLeave }: { session: Session; onLeave: () =
 
   const connected = state === ConnectionState.Connected;
   const disabled = busy || leaving || !connected;
+  const warning = error || (audioWarning ? encryptionMessage : '');
 
   return (
     <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
       <Text accessibilityRole="header" style={styles.title}>{session.roomName}</Text>
-      <Text style={styles.detail}>{admission.role} · {state}</Text>
+      <Text style={styles.detail}>{admission.role} · {state}{session.encrypted ? ' · E2EE required' : ''}</Text>
       <Action label={leaving ? 'Leaving…' : 'Leave room'} disabled={leaving} onPress={async () => {
         setLeaving(true);
         try { await close(); } catch (cause) { report(cause); } finally { onLeave(); }
       }} />
-      {error ? <Text accessibilityRole="alert" style={styles.error}>{error}</Text> : null}
+      {warning ? <Text accessibilityRole="alert" style={styles.error}>{warning}</Text> : null}
       {admission.role !== 'viewer' &&
         <View style={styles.row}>
           <Action label={micEnabled ? 'Mute mic' : 'Start mic'} disabled={disabled}

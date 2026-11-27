@@ -1,8 +1,8 @@
 PODS:
-  - dtelecom-react-native (2.0.1):
-    - dtelecom-react-native-webrtc (= 150.2.0-preview.0)
+  - dtelecom-react-native (2.1.0):
+    - dtelecom-react-native-webrtc (= 150.2.0)
     - React-Core
-  - dtelecom-react-native-webrtc (150.2.0-preview.0):
+  - dtelecom-react-native-webrtc (150.2.0):
     - LiveKitWebRTC (= 150.7871.04)
     - React-Core
   - FBLazyVector (0.86.0)
@@ -2171,8 +2171,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon/yoga"
 
 SPEC CHECKSUMS:
-  dtelecom-react-native: b4362f635562a72c3ee313c3c1e4ba1cfd119a73
-  dtelecom-react-native-webrtc: 19514ca2e42500a898facb551cc676f3eb3393e6
+  dtelecom-react-native: 8979d794f7d30b206b193f356348ef8634876c5c
+  dtelecom-react-native-webrtc: c62ac63d806092a7b0bbc28a94edd1f8c5402f30
   FBLazyVector: b3e7ad108f0d882e30445c5527d774e3fd432f3d
   hermes-engine: bef4fcf2f625443b080d153fcd1fe91304c2f479
   LiveKitWebRTC: 273ccc71c520e9cf6f28ff42e402940b71e3e34d

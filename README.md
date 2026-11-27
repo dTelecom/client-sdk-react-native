@@ -1,19 +1,13 @@
 # dTelecom React Native SDK
 
-The dTelecom React Native SDK 2.0 for iOS and Android connects to dTelecom rooms, publishes camera and microphone tracks, renders remote video and exchanges room data. It uses the same room client as dTelecom web apps. The [iOS and Android example app](example/README.md) joins [Meet meetings](https://dtelecom-meet.vercel.app/) and [Live streams](https://dtelecom-live.vercel.app/) using the browser’s invite link or QR code. In both apps, mobile participants can hear desktop audio and see camera video and shared screens.
+The dTelecom React Native SDK 2.1 for iOS and Android connects to dTelecom rooms, publishes camera and microphone tracks, renders remote video and exchanges room data. It uses the same room client as dTelecom web apps. The [iOS and Android example app](example/README.md) joins [Meet meetings](https://dtelecom-meet.vercel.app/) and [Live streams](https://dtelecom-live.vercel.app/) using the browser’s invite link or QR code. In both apps, mobile participants can hear desktop audio and see camera video and shared screens.
 
 ## Install
 
-Use React Native 0.86, React 19.2.3 and Node 22.13 or later within Node 22. The SDK supports iOS 15.1 or later and Android API 24 or later. npm resolves its pinned room client (1.12.28) and WebRTC bridge (150.2.0-preview.0) automatically.
+Use React Native 0.86, React 19.2.3 and Node 22.13 or later within Node 22. The SDK supports iOS 15.1 or later and Android API 24 or later. npm resolves its pinned room client (1.13.0) and WebRTC bridge (150.2.0) automatically.
 
 ```sh
-npm install @dtelecom/react-native@2.0.1
-```
-
-To test a local wrapper build, use its tarball path in the install command. npm downloads both peers from the registry.
-
-```sh
-npm install --no-save /absolute/path/to/dtelecom-react-native-2.0.1.tgz
+npm install @dtelecom/react-native@2.1.0
 ```
 
 On iOS, include both sources in your Podfile and run `bundle exec pod install` from the iOS directory. The first source supplies the pinned WebRTC binary. Add camera and microphone usage descriptions if the app offers capture.
@@ -34,6 +28,12 @@ override fun onCreate() {
     loadReactNative(this)
 }
 ```
+
+## Room UI, encrypted media and native integrations
+
+Use the [room provider, track and data hooks](docs/room-components.md) to share a room across React components. For encrypted meetings or broadcasts, supply the same media key to each participant. Apps manage their own key delivery. [Encrypted audio and video](docs/encrypted-media.md)
+
+Incoming calls are optional. Apps that use system calling supply their own push delivery and connect native call events to the room. Apps that process microphone audio can register a capture processor. [System calling](docs/system-calls.md) · [Microphone processing](docs/capture-processing.md)
 
 ## Join a room
 

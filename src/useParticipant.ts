@@ -45,6 +45,7 @@ export function useParticipant(participant: Participant): ParticipantState {
       ParticipantEvent.TrackUnmuted,
       ParticipantEvent.IsSpeakingChanged,
       ParticipantEvent.ParticipantMetadataChanged,
+      ParticipantEvent.ParticipantNameChanged,
       ParticipantEvent.ConnectionQualityChanged,
       ParticipantEvent.TrackPublished,
       ParticipantEvent.TrackUnpublished,

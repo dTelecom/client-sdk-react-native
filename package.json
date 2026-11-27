@@ -1,6 +1,6 @@
 {
   "name": "@dtelecom/react-native",
-  "version": "2.0.1",
+  "version": "2.1.0",
   "description": "React Native SDK for dTelecom rooms on iOS and Android",
   "main": "lib/commonjs/index",
   "module": "lib/module/index",
@@ -13,6 +13,7 @@
     "android",
     "ios",
     "cpp",
+    "docs/*.md",
     "dtelecom-react-native.podspec",
     "!lib/typescript/example",
     "!lib/typescript/ci",
@@ -56,7 +57,7 @@
     "@babel/preset-env": "^7.20.0",
     "@babel/runtime": "^7.20.0",
     "@commitlint/config-conventional": "^16.2.1",
-    "@dtelecom/react-native-webrtc": "150.2.0-preview.0",
+    "@dtelecom/react-native-webrtc": "150.2.0",
     "@react-native-community/eslint-config": "^3.2.0",
     "@release-it/conventional-changelog": "^4.2.0",
     "@tsconfig/react-native": "^2.0.2",
@@ -78,20 +79,21 @@
     "release-it": "^14.2.2",
     "typedoc": "0.28.14",
     "typescript": "5.9.3",
-    "@dtelecom/livekit-client": "1.12.28",
+    "@dtelecom/livekit-client": "1.13.0",
     "@react-native/babel-preset": "0.86.0",
-    "@react-native/jest-preset": "0.86.0"
+    "@react-native/jest-preset": "0.86.0",
+    "react-test-renderer": "19.2.3"
   },
   "peerDependencies": {
-    "@dtelecom/livekit-client": "1.12.28",
-    "@dtelecom/react-native-webrtc": "150.2.0-preview.0",
+    "@dtelecom/livekit-client": "1.13.0",
+    "@dtelecom/react-native-webrtc": "150.2.0",
     "react": "^19.2.3",
     "react-native": "0.86.x"
   },
   "scripts": {
     "test": "jest",
     "build-docs": "typedoc  --tsconfig tsconfig.build.json",
-    "typescript": "tsc --noEmit -p tsconfig.build.json",
+    "typescript": "tsc --noEmit -p tsconfig.build.json && tsc --noEmit -p ci/room-components/tsconfig.json",
     "lint": "eslint \"src/**/*.{ts,tsx}\"",
     "prepare": "bob build",
     "release": "release-it",

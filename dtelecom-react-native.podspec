@@ -15,8 +15,8 @@ Pod::Spec.new do |s|
 
   s.source_files = "ios/**/*.{h,m,mm}"
 
-  s.frameworks   = 'AVFoundation', 'AVKit'
+  s.frameworks   = 'AVFoundation', 'AVKit', 'CallKit'
 
   s.dependency "React-Core"
-  s.dependency "dtelecom-react-native-webrtc", "150.2.0-preview.0"
+  s.dependency "dtelecom-react-native-webrtc", "150.2.0"
 end

@@ -117,6 +117,31 @@ public class AudioSwitchManager {
         preferredDeviceList.add(AudioDevice.Earpiece.class);
     }
 
+    /** A previous viewer may have selected media playback. Restore that policy after the call. */
+    public Runnable configureSystemCall() {
+        final boolean oldFocus = manageAudioFocus;
+        final int oldFocusMode = focusMode, oldMode = audioMode, oldStream = audioStreamType;
+        final int oldUsage = audioAttributeUsageType, oldContent = audioAttributeContentType;
+        final boolean oldForce = forceHandleAudioRouting;
+        stop();
+        manageAudioFocus = true;
+        focusMode = AudioManager.AUDIOFOCUS_GAIN;
+        audioMode = AudioManager.MODE_IN_COMMUNICATION;
+        audioStreamType = AudioManager.STREAM_VOICE_CALL;
+        audioAttributeUsageType = AudioAttributes.USAGE_VOICE_COMMUNICATION;
+        audioAttributeContentType = AudioAttributes.CONTENT_TYPE_SPEECH;
+        forceHandleAudioRouting = false;
+        return () -> {
+            manageAudioFocus = oldFocus;
+            focusMode = oldFocusMode;
+            audioMode = oldMode;
+            audioStreamType = oldStream;
+            audioAttributeUsageType = oldUsage;
+            audioAttributeContentType = oldContent;
+            forceHandleAudioRouting = oldForce;
+        };
+    }
+
     public void start() {
         if (audioSwitch != null) return;
         audioSwitch = new AudioSwitch(context, loggingEnabled, audioFocusChangeListener, preferredDeviceList);
@@ -128,7 +153,7 @@ public class AudioSwitchManager {
             audioSwitch.setAudioAttributeContentType(audioAttributeContentType);
             audioSwitch.setAudioAttributeUsageType(audioAttributeUsageType);
             audioSwitch.setForceHandleAudioRouting(forceHandleAudioRouting);
-            audioSwitch.start(audioDeviceChangeListener);
+            audioSwitch.start((devices, selected) -> audioDeviceChangeListener.invoke(devices, selected));
             audioSwitch.activate();
         } catch (RuntimeException failure) {
             stop();

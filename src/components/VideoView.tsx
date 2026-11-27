@@ -19,6 +19,8 @@ import ViewPortDetector from './ViewPortDetector';
 
 export type Props = {
   videoTrack?: VideoTrack | undefined;
+  /** Only render this local camera while a lens switch is in progress. */
+  cameraDeviceId?: string;
   style?: StyleProp<ViewStyle>;
   objectFit?: 'cover' | 'contain' | undefined;
   mirror?: boolean;
@@ -30,6 +32,7 @@ export type Props = {
 export const VideoView = ({
   style = {},
   videoTrack,
+  cameraDeviceId,
   objectFit = 'cover',
   zOrder,
   mirror,
@@ -67,6 +70,14 @@ export const VideoView = ({
     }
     return undefined;
   }, [videoTrack, elementInfo]);
+
+  const camera = mediaStream?.getVideoTracks()[0];
+  if (
+    cameraDeviceId &&
+    camera?.getSettings()?.deviceId !== cameraDeviceId &&
+    camera?.getConstraints()?.deviceId !== cameraDeviceId
+  )
+    return <View style={style} />;
 
   return (
     <View

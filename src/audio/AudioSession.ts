@@ -233,7 +233,11 @@ export default class AudioSession {
   static configureAudio = async (config: AudioConfiguration) => {
     if (Platform.OS === 'ios') {
       if (config.ios) preferSpeaker = config.ios.defaultOutput !== 'earpiece';
-      if (sessionStarted) configureAppleSession();
+      if (
+        sessionStarted &&
+        !(await NativeModules.DtelecomSystemCalls?.currentCallId())
+      )
+        configureAppleSession();
     } else if (Platform.OS === 'android') {
       await DtelecomReactNative.configureAudio(config);
     }
@@ -244,7 +248,11 @@ export default class AudioSession {
    */
   static startAudioSession = async () => {
     if (Platform.OS === 'ios') {
-      configureAppleSession();
+      if (await NativeModules.DtelecomSystemCalls?.currentCallId()) {
+        AudioDeviceModule.setAutomaticAudioSessionConfiguration(null);
+      } else {
+        configureAppleSession();
+      }
       sessionStarted = true;
     } else if (Platform.OS === 'android') {
       await DtelecomReactNative.startAudioSession();

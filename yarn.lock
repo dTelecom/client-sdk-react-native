@@ -2634,10 +2634,10 @@
   dependencies:
     "@cspotcode/source-map-consumer" "0.8.0"
 
-"@dtelecom/livekit-client@1.12.28":
-  version "1.12.28"
-  resolved "https://registry.npmjs.org/@dtelecom/livekit-client/-/livekit-client-1.12.28.tgz#584bfcf0b9e7c29bfe48dce93e2ff789ddea13fd"
-  integrity sha512-Jy66OYzTOrq7JWlNeY0Iw+sq0JlMJCG7gbiZwzGe/mtkZrFdl/3B5p63Hzw11uL2DAqr7Jjf80BvtJlxvOnR6A==
+"@dtelecom/livekit-client@1.13.0":
+  version "1.13.0"
+  resolved "https://registry.npmjs.org/@dtelecom/livekit-client/-/livekit-client-1.13.0.tgz#18c6adc6c4aec4c9f1d5c56c03a087658b3f5571"
+  integrity sha512-T6vOJn2WAsHReOKlsaNIZtxopCrUYl5uEqwhclrT48v2++hXl947Cynq0MxQej6AnBRyXj4kt4Lx9ID09u4p2g==
   dependencies:
     eventemitter3 "^5.0.1"
     loglevel "^1.8.0"
@@ -2646,10 +2646,10 @@
     ts-debounce "^4.0.0"
     webrtc-adapter "^8.1.1"
 
-"@dtelecom/react-native-webrtc@150.2.0-preview.0":
-  version "150.2.0-preview.0"
-  resolved "https://registry.npmjs.org/@dtelecom/react-native-webrtc/-/react-native-webrtc-150.2.0-preview.0.tgz#5bdd43c9c06ef8dad8b385c02a08680b51726597"
-  integrity sha512-/yuqiusFABrjASr5jV5uqVNJBECNe9uGrlVfQJPE9cu5ZVt3DqRTx2YlXFvDoEweUh5qn3qxDkmZg38niJeE3Q==
+"@dtelecom/react-native-webrtc@150.2.0":
+  version "150.2.0"
+  resolved "https://registry.npmjs.org/@dtelecom/react-native-webrtc/-/react-native-webrtc-150.2.0.tgz#a4b9b9ffdef375c12df1aad90e7172d976c042c6"
+  integrity sha512-SMz9P/FZRXhKDmKpsAIoZ5wCCM0HZrWiqocj7HID/L1WCUO75CdbWBFpSAtv1b4kdxZJSeCxHtsD8MuABt9/Uw==
   dependencies:
     base64-js "1.5.1"
     debug "4.3.4"
@@ -8668,6 +8668,11 @@ react-is@^18.0.0:
   resolved "https://registry.yarnpkg.com/react-is/-/react-is-18.2.0.tgz#199431eeaaa2e09f86427efbb4f1473edb47609b"
   integrity sha512-xWGDIW6x921xtzPkhiULtthJHoJvBbF3q26fzloPCK0hsvxtPVelvftw3zjbHWSkR2km9Z+4uxbDDK/6Zw9B8w==
 
+react-is@^19.2.3:
+  version "19.3.1"
+  resolved "https://registry.npmjs.org/react-is/-/react-is-19.3.1.tgz#81f7f7e431fc9b5bd9781b0a9f19997f08dee51b"
+  integrity sha512-RRieF6IyxQBkcK6pP8xOHprLTPW6QjRkbGdImtqNme+/hYVwCZkLQLdlZGOhUqXwkS9IEynaGvPJtv6XB/cz0Q==
+
 react-native-builder-bob@^0.18.2:
   version "0.18.2"
   resolved "https://registry.yarnpkg.com/react-native-builder-bob/-/react-native-builder-bob-0.18.2.tgz#e3a96abe3ead84b167c1c1ea97747ef8ffc2a9f4"
@@ -8744,6 +8749,14 @@ react-refresh@^0.14.0:
   version "0.14.2"
   resolved "https://registry.npmjs.org/react-refresh/-/react-refresh-0.14.2.tgz#3833da01ce32da470f1f936b9d477da5c7028bf9"
   integrity sha512-jCvmsr+1IUSMUyzOkRcvnVbX3ZYC6g9TDrDbFuFmRDq7PD4yaGbLKNQL6k2jnArV8hjYxh7hVhAZB6s9HDGpZA==
+
+react-test-renderer@19.2.3:
+  version "19.2.3"
+  resolved "https://registry.npmjs.org/react-test-renderer/-/react-test-renderer-19.2.3.tgz#d20f5193867c98b2df9e13b4e72bb83f311f6a43"
+  integrity sha512-TMR1LnSFiWZMJkCgNf5ATSvAheTT2NvKIwiVwdBPHxjBI7n/JbWd4gaZ16DVd9foAXdvDz+sB5yxZTwMjPRxpw==
+  dependencies:
+    react-is "^19.2.3"
+    scheduler "^0.27.0"
 
 react@19.2.3:
   version "19.2.3"
@@ -9167,7 +9180,7 @@ safe-regex-test@^1.0.0:
   resolved "https://registry.yarnpkg.com/safer-buffer/-/safer-buffer-2.1.2.tgz#44fa161b0187b9549dd84bb91802f9bd8385cd6a"
   integrity sha512-YZo3K82SD7Riyi0E1EQPojLz7kpepnSQI9IyPbHHg1XXXevb5dJI7tpyN2ADxGcQbHG7vcyRHk0cbwqcQriUtg==
 
-scheduler@0.27.0:
+scheduler@0.27.0, scheduler@^0.27.0:
   version "0.27.0"
   resolved "https://registry.npmjs.org/scheduler/-/scheduler-0.27.0.tgz#0c4ef82d67d1e5c1e359e8fc76d3a87f045fe5bd"
   integrity sha512-eNv+WrVbKu1f3vbYJT/xtiF5syA5HPIMtf9IgY/nKg0sWqzAUEvqY/xm7OcZc/qafLx/iO9FgOmeSAp4v5ti/Q==
